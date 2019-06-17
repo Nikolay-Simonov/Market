@@ -13,14 +13,14 @@ namespace Market.DAL.Repositories
 {
     internal class ImageRepository<TModel> : ImageRepositoryBase<TModel> where TModel : class
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ImageRepository(IHostingEnvironment hostingEnvironment)
+        public ImageRepository(IWebHostEnvironment webHostEnvironment)
         {
-            _hostingEnvironment = hostingEnvironment;
+            _webHostEnvironment = webHostEnvironment;
         }
 
-        private string ImagesDirectory => Path.Combine(_hostingEnvironment.WebRootPath, FolderName);
+        private string ImagesDirectory => Path.Combine(_webHostEnvironment.WebRootPath, FolderName);
 
         /// <summary>
         /// Возвращает результат сохранения файла изображения.
@@ -50,7 +50,7 @@ namespace Market.DAL.Repositories
                 }
 
                 string imageFileName = Guid.NewGuid().ToString() + "." + imageExtension;
-                string outputDirectory = _hostingEnvironment.WebRootPath + ImagesDirectory;
+                string outputDirectory = _webHostEnvironment.WebRootPath + ImagesDirectory;
                 string writePath = outputDirectory + "\\" + imageFileName;
                 string outputPath = ImagesDirectory + "\\" + imageFileName;
                 Directory.CreateDirectory(outputDirectory);
@@ -91,7 +91,7 @@ namespace Market.DAL.Repositories
             }
 
             imgFileName = Path.GetFileName(imgFileName);
-            string deleteDirectory = _hostingEnvironment.WebRootPath + ImagesDirectory;
+            string deleteDirectory = _webHostEnvironment.WebRootPath + ImagesDirectory;
 
             if (!Directory.Exists(deleteDirectory))
             {

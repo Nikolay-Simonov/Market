@@ -11,7 +11,7 @@ namespace Market.DAL.Repositories
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public EFUnitOfWork(ApplicationDbContext dbContext, IHostingEnvironment hostingEnvironment)
+        public EFUnitOfWork(ApplicationDbContext dbContext, IWebHostEnvironment webHostEnvironment)
         {
             _dbContext = dbContext;
 
@@ -25,7 +25,7 @@ namespace Market.DAL.Repositories
             Categories = new EfRepository<Category>(_dbContext);
             Countries = new EfRepository<Country>(_dbContext);
             Characteristics = new EfRepository<Characteristic>(_dbContext);
-            ProductsImages = new ImageRepository<Product>(hostingEnvironment);
+            ProductsImages = new ImageRepository<Product>(webHostEnvironment);
         }
 
         public IRepository<Product> Products { get; }
