@@ -1,0 +1,63 @@
+﻿@model IEnumerable<ProductDataVM>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Brand)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Country)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Weight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var product in Model) {
+        <tr>
+            <td>
+                @product.Name
+            </td>
+            <td>
+                @product.Category
+            </td>
+            <td>
+                @product.Brand
+            </td>
+            <td>
+                @product.Country
+            </td>
+            <td>
+                @product.Weight
+            </td>
+            <td>
+                @product.Price
+                <div class="btn-group btn-group-xs" style="float: right">
+                    @if (product.Removed)
+                    {
+                        <input type="button" data-id="@product.Id" onclick="restoreProduct('@product.Id', event)"
+                               class="btn btn-warning" value="Restore" />
+                    }
+                    else
+                    {
+                        <input type="button" data-id="@product.Id" onclick="removeProduct('@product.Id', event)"
+                               class="btn btn-danger" value="Remove" />
+                    }
+                    <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-success">Edit</a>
+                </div>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

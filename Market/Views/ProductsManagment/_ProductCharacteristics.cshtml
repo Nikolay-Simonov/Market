@@ -1,0 +1,25 @@
+﻿@model ProductCharacteristicVM
+
+@foreach (var (key, value) in Model.Characteristics)
+{
+    var name = $"{Model.DictionaryName}[{key}]";
+    <li class="list-group-item" data-value="@key">
+        <div class="row">
+            <div class="col-md-4">
+                <label class="control-label">
+                    @key
+                </label>
+            </div>
+            <div class="col-md-6">
+                <input type="text" value="@value"
+                    class="form-control" id="@name" name="@name"/>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-danger"
+                    onclick="removeCharacteristic('@key')">
+                    Remove
+                </button>
+            </div>
+        </div>
+    </li>
+}

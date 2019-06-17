@@ -1,0 +1,222 @@
+﻿@model ProductsListVM
+
+@{
+    ViewData["Title"] = "Product management";
+}
+
+<h3>@ViewData["Title"]</h3>
+<form>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <input asp-for="Filters.Category" type="text" list="@nameof(Model.Categories)"
+                       autocomplete="off" class="form-control" placeholder="Select a category" />
+                <datalist asp-for="Categories" asp-items="Model.Categories"></datalist>
+            </div>
+            <div class="form-group">
+                <label asp-for="Filters.Name" class="control-label"></label>
+                <input asp-for="Filters.Name" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <input asp-for="Filters.Brand" type="text" list="@nameof(Model.Brands)"
+                       autocomplete="off" class="form-control" placeholder="Select a brand" />
+                <datalist asp-for="Brands" asp-items="Model.Brands"></datalist>
+            </div>
+            <div class="form-group">
+                <label asp-for="Filters.Price" class="control-label"></label>
+                <input asp-for="Filters.Price" type="number" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <input asp-for="Filters.Country" type="text" list="@nameof(Model.Countries)"
+                       autocomplete="off" class="form-control" placeholder="Select a country" />
+                <datalist asp-for="Countries" asp-items="Model.Countries"></datalist>
+            </div>
+            <div class="form-group">
+                <label asp-for="Filters.Weight" class="control-label"></label>
+                <input asp-for="Filters.Weight" type="number" class="form-control" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div>
+                <label asp-for="Filters.Removed" class="control-label"></label>
+            </div>
+            <div class="form-group">
+                <div input-class="btn btn-success" active-class="active" class="btn-group"
+                    data-toggle="buttons" radio-group-enum="Filters.Removed"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <div class="btn-group">
+                    <input type="button" value="Reset" onclick="resetFilters()" class="btn btn-warning" />
+                    <input type="submit" value="Filter" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group text-right">
+                <a asp-action="Create" class="btn btn-primary">Create New</a>
+            </div>
+        </div>
+    </div>
+</form>
+<hr />
+<h3>Product list</h3>
+<div class="row">
+    <div class="col-md-12">
+        <div class="btn-group m-1" paging-info="@Model.PagingInfo" page-action="List"
+             page-class="btn" page-class-normal="btn-secondary" page-class-selected="btn-primary"
+             button-text="Navigate" enable-arrows="true">
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        @{ await Html.RenderPartialAsync("_ProductDataList", Model.Products); }
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        let labels = document.querySelectorAll("label[class*='btn']");
+
+        for (let i = 0; i < labels.length; i++) {
+            labels[i].addEventListener("click", function () {
+                labels[i].children[0].setAttribute("checked", "");
+                document.querySelector("input[type='submit']").click();
+            });
+        }
+    });
+
+    function resetFilters() {
+        let inputs = document.getElementsByTagName("input");
+        let submit = document.querySelector("input[type='submit']");
+
+        for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].type !== "submit" && inputs[i].type !== "button") {
+                inputs[i].value = "";
+            }
+        }
+        submit.click();
+    }
+
+    // Вернет данные вместе с токеном против подделки
+    function getRequestVerificationToken(data) {
+        data.__RequestVerificationToken = $("input[name=__RequestVerificationToken]").val();
+        return data;
+    }
+
+    // Запрос на удаление из каталога
+    function removeProduct(id, event) {
+        event.preventDefault();
+        swal({
+            title: "Attention",
+            text: "Do you really want to remove the product from the market?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        },
+        function (isConfirm) {
+            if (isConfirm) {
+                $.ajax({
+                    cache: false,
+                    async: true,
+                    url: "@Url.Action("Remove")",
+                    type: "POST",
+                    dateType: JSON,
+                    data: getRequestVerificationToken({ "id": id }),
+                    success: function (result) {
+                        swal({
+                            title: result.title,
+                            text: result.message,
+                            type: result.messageType
+                        },
+                        function () {
+                            if (result.messageType === "success") {
+                                let radio = $('input[checked]');
+                                let button = $(`input[data-id="${id}"]`);
+
+                                if (radio.val() === "No") {
+                                    const row = 2;
+                                    button.parents()[row].remove();
+                                    return;
+                                }
+
+                                button.attr("onclick", `restoreProduct('${id}', event)`);
+                                button.attr("class", "btn btn-warning");
+                                button.val("Restore");
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // Запрос на восстановление в каталог
+    function restoreProduct(id, event) {
+        event.preventDefault();
+        swal({
+            title: "Attention",
+            text: "Do you really want to restore the product?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        },
+        function (isConfirm) {
+            if (isConfirm) {
+                $.ajax({
+                    cache: false,
+                    async: true,
+                    url: "@Url.Action("Restore")",
+                    type: "POST",
+                    dateType: JSON,
+                    data: getRequestVerificationToken({ "id": id }),
+                    success: function (result) {
+                        swal({
+                            title: result.title,
+                            text: result.message,
+                            type: result.messageType
+                        },
+                        function () {
+                            if (result.messageType === "success") {
+                                let radio = $('input[checked]');
+                                let button = $(`input[data-id="${id}"]`);
+
+                                if (radio.val() === "Yes") {
+                                    const row = 2;
+                                    button.parents()[row].remove();
+                                    return;
+                                }
+
+                                button.attr("onclick", `removeProduct('${id}', event)`);
+                                button.attr("class", "btn btn-danger");
+                                button.val("Remove");
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+</script>
+
+@section Sweetalert {
+    @{ await Html.RenderPartialAsync("_SweetalertPartial"); }
+}

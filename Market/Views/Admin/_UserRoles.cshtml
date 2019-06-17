@@ -1,0 +1,23 @@
+﻿@model EmployeeCreateVM
+
+@if (Model.Roles != null && Model.Roles.Any())
+{
+    @foreach (var role in Model.Roles)
+    {
+        <li data-value="@role" class="list-group-item">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>@role</label>
+                    <input type="hidden" readonly="readonly" value="@role" asp-for="@Model.Roles" />
+                </div>
+                <div class="col-md-8">
+                    <div class="text-right">
+                        <button type="button" class="btn btn-xs btn-danger" onclick="removeRole('@role')">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </li>
+    }
+}

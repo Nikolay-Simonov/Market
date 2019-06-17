@@ -1,0 +1,17 @@
+﻿<environment include="Development">
+    <script src="~/lib/bootstrap-sweetalert/dist/sweetalert.js"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap-sweetalert/dist/sweetalert.css"/>
+</environment>
+<environment exclude="Development">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"
+            asp-fallback-src="~/lib/bootstrap-sweetalert/dist/sweetalert.min.js"
+            asp-fallback-test="window.swal"
+            crossorigin="anonymous"
+            integrity="sha256-JirYRqbf+qzfqVtEE4GETyHlAbiCpC005yBTa4rj6xg=">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css"
+          asp-fallback-href="~/lib/bootstrap-sweetalert/dist/sweetalert.min.css"
+          asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
+          integrity="sha256-zuyRv+YsWwh1XR5tsrZ7VCfGqUmmPmqBjIvJgQWoSDo="
+          crossorigin="anonymous" />
+</environment>

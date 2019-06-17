@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Description>Dot Net abstraction of javascript toastr to create toast notification on ASP.NET Core MVC Projects</Description>
+    <Copyright>Nabin Karki Thapa</Copyright>
+    <AssemblyTitle>NToastNotify</AssemblyTitle>
+    <VersionPrefix>5.0.10</VersionPrefix>
+    <Authors>Nabin Kakri Thapa</Authors>
+    <PackageProjectUrl>https://github.com/nabinked/NToastNotify</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>ASP.NET Core MVC toastr toast notification server side rendered </PackageTags>
+    <RepositoryUrl>https://github.com/nabinked/NToastNotify</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/nabinked/NToastNotify/releases</PackageReleaseNotes>
+    <AssemblyName>NToastNotify</AssemblyName>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <LangVersion>8</LangVersion>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="js\dist\**\*.js" />
+    <EmbeddedResource Include="js\dist\**\*.js.map" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.0.0-preview6.19307.2" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.0.0-preview6.19304.6" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,106 @@
+﻿@model EmployeeCreateVM
+@{
+    ViewData["Title"] = "Create employee";
+}
+
+<form asp-action="CreateEmployee" method="post">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <h2>@ViewData["Title"]</h2>
+            </div>
+            <div class="form-group">
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </div>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MiddleName" class="control-label"></label>
+                <input asp-for="MiddleName" class="form-control" />
+                <span asp-validation-for="MiddleName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-8">
+            <label asp-for="Roles" class="control-label"></label>
+            <ul class="list-group" id="RolesList">
+                @{ await Html.RenderPartialAsync("_UserRoles", Model); }
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="AvailableRoles" class="control-label"></label>
+                <select id="SelectRole" class="form-control" asp-items="@new SelectList(Model.AvailableRoles)"></select>
+            </div>
+            <div class="form-group text-right">
+                <button type="button" class="btn btn-sm btn-success" onclick="addRole()">Add role to list</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<template id="ListItem">
+    <li data-value="RolePlaceholder" class="list-group-item">
+        <div class="row">
+            <div class="col-md-4">
+                <label>RolePlaceholder</label>
+                <input type="hidden" readonly="readonly" value="RolePlaceholder" asp-for="@Model.Roles" />
+            </div>
+            <div class="col-md-8">
+                <div class="text-right">
+                    <button type="button" class="btn btn-xs btn-danger" onclick="removeRole('RolePlaceholder')">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </li>
+</template>
+
+<script type="text/javascript">
+    function addRole() {
+        let selectRole = document.querySelector("#SelectRole");
+        let role = selectRole.options[selectRole.selectedIndex].value;
+        let li = document.querySelector(`ul[id="RolesList"] > li[data-value="${role}"]`);
+
+        if (li !== null && li !== undefined) {
+            return;
+        }
+
+        let ul = document.querySelector('ul[id="RolesList"]');
+        let templateHtml = document.querySelector('template[id="ListItem"]').innerHTML;
+
+        templateHtml = templateHtml.replace(/RolePlaceholder/g, role);
+        ul.insertAdjacentHTML("afterBegin", templateHtml);
+    }
+
+    function removeRole(role) {
+        document.querySelector(`ul[id="RolesList"] > li[data-value="${role}"]`).remove();
+    }
+</script>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

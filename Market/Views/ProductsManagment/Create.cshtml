@@ -1,0 +1,288 @@
+﻿@model ProductCreateVM
+
+@{
+    ViewData["Title"] = "Create product";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+<form asp-action="Create" id="CreateProduct" enctype="multipart/form-data" method="post">
+    <div class="row">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Categories" class="control-label"></label>
+                <input asp-for="Product.CategoryId" type="text" list="@nameof(Model.Categories)"
+                       autocomplete="off" class="form-control" placeholder="Select a category" />
+                <datalist asp-for="Categories" asp-items="Model.Categories"></datalist>
+            </div>
+            <div class="form-group">
+                <label asp-for="Product.Name" class="control-label"></label>
+                <input asp-for="Product.Name" class="form-control" />
+                <span asp-validation-for="Product.Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Brands" class="control-label"></label>
+                <input asp-for="Product.BrandId" type="text" list="@nameof(Model.Brands)"
+                       autocomplete="off" class="form-control" placeholder="Select a brand" />
+                <datalist asp-for="Brands" asp-items="Model.Brands"></datalist>
+            </div>
+            <div class="form-group">
+                <label asp-for="Product.Price" class="control-label"></label>
+                <input asp-for="Product.Price" class="form-control" />
+                <span asp-validation-for="Product.Price" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Countries" class="control-label"></label>
+                <input asp-for="Product.CountryId" type="text" list="@nameof(Model.Countries)"
+                       autocomplete="off" class="form-control" placeholder="Select a country" />
+                <datalist asp-for="Countries" asp-items="Model.Countries"></datalist>
+            </div>
+            <div class="form-group">
+                <label asp-for="Product.Weight" class="control-label"></label>
+                <input asp-for="Product.Weight" class="form-control" />
+                <span asp-validation-for="Product.Weight" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <img class="img-thumbnail" id="@nameof(Model.Image)"
+                 alt="Product image" style="max-height: 300px" src="@Model.Product?.Image"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
+                <input type="file" class="btn btn-default" asp-for="Image" accept="image/*" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Product.Description" class="control-label"></label>
+                <textarea asp-for="Product.Description" class="form-control"></textarea>
+                <span asp-validation-for="Product.Description" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-8">
+            <h4>Product characteristics</h4>
+            <ul class="list-group" id="CharsList">
+                @if (Model.Product != null)
+                {
+                    var charsModel = new ProductCharacteristicVM
+                    {
+                        DictionaryName = nameof(Model.Characteristics),
+                        Characteristics = Model.Characteristics
+                    };
+                    await Html.RenderPartialAsync("_ProductCharacteristics", charsModel);
+                }
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <h4>Available сharacteristics</h4>
+                <input list="@nameof(Model.AvailableCharacteristics)" type="text" class="form-control" placeholder="Select a characteristic" />
+                <datalist asp-for="AvailableCharacteristics" asp-items="Model.AvailableCharacteristics"></datalist>
+            </div>
+            <div class="form-group">
+                <button onclick="addCharacteristic()" style="float: right"
+                        type="button" class="btn btn-success">
+                    Add characteristic to List
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 10px">
+        <div class="col-md-12">
+            <input type="submit" value="Create" class="btn btn-primary" style="float: right" />
+            <a asp-action="List" class="btn btn-default">Back to List</a>
+        </div>
+    </div>
+</form>
+
+<template id="ListItem">
+    <li class="list-group-item" data-value="KeyPlaceholder">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="control-label">KeyPlaceholder</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input type="text" value="ValuePlaceholder"
+                           class="form-control" id="NamePlaceholder" name="NamePlaceholder" />
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger"
+                            onclick="removeCharacteristic('KeyPlaceholder')">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </li>
+</template>
+
+<style>
+    textarea {
+        max-width: 100%;
+        min-width: 100%;
+        min-height: 100px;
+    }
+</style>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        let inputs = document.querySelectorAll("input[list]");
+
+        for (let i = 0; i < inputs.length; i++) {
+            // Замена значения input на соответствующее value из даталиста при загрузке страницы.
+            let datalist = inputs[i].list;
+
+            for (let j = 0; j < datalist.options.length; j++) {
+                if (datalist.options[j].hasAttribute("data-value")) {
+                    if (inputs[i].value === datalist.options[j].getAttribute("data-value")) {
+                        inputs[i].value = datalist.options[j].value;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (document.querySelector("img#@nameof(Model.Image)").src === "") {
+            document.querySelector("img#@nameof(Model.Image)").style.display = "none";
+        }
+    });
+
+    // Обработчик события отправки формы, валидирует и заменяет значения инпутов.
+    document.querySelector("form#CreateProduct").addEventListener("submit", function (e) {
+        if (!$("form#CreateProduct").valid()) {
+            e.preventDefault();
+            return false;
+        }
+
+        let inputs = document.querySelectorAll("input[list]");
+
+        for (let i = 0; i < inputs.length; i++) {
+            validateDataListInput(inputs[i]);
+
+            if (!inputs[i].checkValidity()) {
+                inputs[i].reportValidity();
+                e.preventDefault();
+                return false;
+            }
+
+            let datalist = inputs[i].list;
+
+            for (let j = 0; j < datalist.options.length; j++) {
+                if (inputs[i].value === datalist.options[j].value) {
+                    if (datalist.options[j].hasAttribute("data-value")) {
+                        inputs[i].value = datalist.options[j].getAttribute("data-value");
+                        break;
+                    }
+                }
+            }
+        }
+
+        return true;
+    });
+
+    // Обработчик события отображения изображения.
+    document.querySelector("input#@nameof(Model.Image)")
+        .addEventListener("change", function () {
+        readURL(this);
+    });
+
+    // Валидирует инпут на наличие значение из даталиста
+    function validateDataListInput(input) {
+        if (input.value === undefined || input.value === null || input.value === "") {
+            if (!input.hasAttribute("data-val-required")) {
+                input.setCustomValidity("");
+                return;
+            }
+        }
+
+        let optionFound = false;
+        let datalist = input.list;
+
+        for (let j = 0; j < datalist.options.length; j++) {
+            if (input.value === datalist.options[j].value) {
+                optionFound = true;
+                break;
+            }
+        }
+
+        if (optionFound) {
+            input.setCustomValidity("");
+        } else {
+            input.setCustomValidity("Please select a valid value");
+        }
+    }
+
+    // Добавление характеристики.
+    function addCharacteristic() {
+        let input = document.querySelector('input[list="@nameof(Model.AvailableCharacteristics)"]');
+
+        validateDataListInput(input);
+
+        if (!input.checkValidity()
+            || input.value === null || input.value === undefined || input.value === "") {
+            input.reportValidity();
+            return;
+        }
+
+        let name = "@nameof(Model.Characteristics)" + `[${input.value}]`;
+        let li = document.querySelector(`ul[id="CharsList"] > li[data-value="${input.value}"]`);
+
+        if (li !== null && li !== undefined) {
+            return;
+        }
+
+        let ul = document.querySelector('ul[id="CharsList"]');
+        let templateHtml = document.querySelector('template[id="ListItem"]').innerHTML;
+
+        templateHtml = templateHtml.replace(/KeyPlaceholder/g, input.value);
+        templateHtml = templateHtml.replace(/NamePlaceholder/g, name);
+        templateHtml = templateHtml.replace(/ValuePlaceholder/g, "");
+
+        ul.insertAdjacentHTML("afterBegin", templateHtml);
+        input.value = "";
+    }
+
+    // Удаление характеристики.
+    function removeCharacteristic(key) {
+        document.querySelector(`li[data-value="${key}"]`).remove();
+    }
+
+    // Установка изображения.
+    function readURL(input) {
+        let image = document.querySelector("img#@nameof(Model.Image)");
+
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+
+            reader.onload = function(e) {
+                image.src = e.target.result;
+                image.style.display = "";
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            image.style.display = "none";
+        }
+    }
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

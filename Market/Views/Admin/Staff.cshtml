@@ -1,0 +1,122 @@
+﻿@model StaffListVM
+
+@{
+    ViewData["Title"] = "Staff list";
+}
+
+<h3>@ViewData["Title"]</h3>
+<form asp-action="Staff" method="get">
+    <div class="row">
+        <div class="col-md-12 form-inline">
+            <div class="form-group">
+                <label asp-for="NameOrEmail" class="control-label"></label>
+                <input asp-for="NameOrEmail" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Filter" class="btn btn-default" />
+            </div>
+            <div class="form-group" style="float: right">
+                <a asp-action="CreateEmployee" class="btn btn-primary">Create employee</a>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="row">
+    <div class="col-md-12">
+        <div class="btn-group m-1" paging-info="@Model.PagingInfo" page-action="List"
+             page-class="btn" page-class-normal="btn-secondary" page-class-selected="btn-primary"
+             button-text="Navigate" enable-arrows="true">
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        @{ await Html.RenderPartialAsync("_StaffDataList", Model.Staff); }
+    </div>
+</div>
+
+<script type="text/javascript">
+// Вернет данные вместе с токеном против подделки.
+function getRequestVerificationToken(data) {
+    data.__RequestVerificationToken = $("input[name=__RequestVerificationToken]").val();
+    return data;
+}
+
+// Запрос на удаление элемента.
+function deleteEmployee(id, uri, event) {
+    event.preventDefault();
+    swal({
+        title: "Attention",
+        text: "Do you really want to delete an Employee?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonClass: "btn-danger",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: false,
+        closeOnCancel: true
+    },
+    function (isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                cache: false,
+                async: true,
+                url: uri,
+                type: "POST",
+                dateType: JSON,
+                data: getRequestVerificationToken({ "id": id }),
+                success: function (result) {
+                    swal({
+                        title: result.title,
+                        text: result.message,
+                        type: result.messageType
+                    },
+                    function () {
+                        if (result.messageType === "success") {
+                            $(`tr[data-id="${id}"]`).remove();
+                        }
+                    });
+                }
+            });
+        }
+    });
+}
+
+function resetPassword(id, event) {
+    event.preventDefault();
+    swal({
+        title: "Password change",
+        type: "input",
+        inputType: "password",
+        inputPlaceholder: "Enter the password or it will be generated",
+        confirmButtonClass: "btn-danger",
+        confirmButtonText: "Change",
+        inputAttributes: {
+            autocapitalize: "off",
+            autocorrect: "off"
+        }
+    },
+    function(input) {
+        $.ajax({
+            cache: false,
+            async: true,
+            url: "@Url.Action("ResetPassword")",
+            type: "POST",
+            dateType: JSON,
+            data: getRequestVerificationToken({ "id": id, "password" : input }),
+            success: function (result) {
+                swal({
+                    title: result.title,
+                    text: result.message,
+                    type: result.messageType
+                })
+            }
+        });
+    });
+}
+</script>
+
+@section Sweetalert
+{
+    @{ await Html.RenderPartialAsync("_SweetalertPartial"); }
+}
