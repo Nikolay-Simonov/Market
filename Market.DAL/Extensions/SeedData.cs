@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using Market.DAL.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -57,16 +58,46 @@ namespace Market.DAL.Extensions
             {
                 FirstName = "Admin",
                 LastName = "Adminov",
-                UserName = configuration.GetValue<string>("AdminSettings:Email"),//"administratortest@gmail.com",
-                Email = configuration.GetValue<string>("AdminSettings:Email"),//"administratortest@gmail.com",
+                UserName = configuration.GetValue<string>("AdminSettings:Email"),
+                Email = configuration.GetValue<string>("AdminSettings:Email"),
                 Address = "localhost",
                 EmailConfirmed = true
             };
 
-            await usersManager.CreateAsync(admin,configuration.GetValue<string>("AdminSettings:Password"));
+            var stringBuilder = new StringBuilder();
 
-            await usersManager.Users.FirstOrDefaultAsync(u => u.Email == "administratortest@gmail.com");
-            await usersManager.AddToRolesAsync(admin, new[] { "Admin", "ContentManager" });
+            IdentityResult createResult = await usersManager
+                .CreateAsync(admin,configuration.GetValue<string>("AdminSettings:Password"));
+
+            if (createResult.Succeeded)
+            {
+                IdentityResult addRolesResult = await usersManager
+                    .AddToRolesAsync(admin, new[] { "Admin", "ContentManager" });
+
+                if (createResult.Succeeded)
+                {
+                    return;
+                }
+
+                foreach (IdentityError error in addRolesResult.Errors)
+                {
+                    stringBuilder.AppendLine(error.Description);
+                }
+            }
+            else
+            {
+                foreach (IdentityError error in createResult.Errors)
+                {
+                    stringBuilder.AppendLine(error.Description);
+                }
+            }
+
+            string errorMessage = stringBuilder.ToString();
+
+            if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                throw new Exception(errorMessage);
+            }
         }
     }
 }
