@@ -516,24 +516,23 @@ namespace Market.BLL.Services
         /// </summary>
         public Dictionary<string, string> GetCharacteristicsFromXml(string xml)
         {
-            var characteristics = new Dictionary<string, string>();
-
             if (string.IsNullOrWhiteSpace(xml))
             {
-                return characteristics;
+                return new Dictionary<string, string>();
             }
 
             var root = XElement.Parse(xml);
 
-            if (root.Name != "сharacteristics")
+            if (root.Name != "characteristics")
             {
-                return characteristics;
+                return new Dictionary<string, string>();
             }
 
-            foreach (XElement el in root.Elements())
-            {
-                characteristics.Add(el.Name.LocalName, el.Value);
-            }
+            Dictionary<string, string> characteristics = root.Elements("characteristic")
+                .Where(c => !c.IsEmpty
+                            && c.Elements("name").Count(n => !string.IsNullOrWhiteSpace(n.Value)) == 1
+                            && c.Elements("value").Count(v => !string.IsNullOrWhiteSpace(v.Value)) == 1)
+                .ToDictionary(с => с.Element("name").Value, c => c.Element("value").Value);
 
             return characteristics;
         }
@@ -543,16 +542,24 @@ namespace Market.BLL.Services
         /// </summary>
         public string GetCharacteristicsFromDictionary(IDictionary<string, string> characteristics)
         {
-            if (characteristics == null || characteristics.Count < 1)
+            if (characteristics == null || !characteristics.Any())
             {
                 return string.Empty;
             }
 
-            var root = new XElement("сharacteristics");
+            var root = new XElement("characteristics");
 
             foreach (var (key, value) in characteristics)
             {
-                root.Add(new XElement(key, value));
+                if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+                {
+                    continue;
+                }
+
+                var characteristic = new XElement("characteristic");
+                characteristic.Add(new XElement("name", key));
+                characteristic.Add(new XElement("value", value));
+                root.Add(characteristic);
             }
 
             return root.ToString();

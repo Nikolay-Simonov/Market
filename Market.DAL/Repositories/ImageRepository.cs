@@ -6,21 +6,20 @@ using System.Threading.Tasks;
 using Market.DAL.Enums;
 using Market.DAL.Interfaces;
 using Market.DAL.Results;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
 namespace Market.DAL.Repositories
 {
     internal class ImageRepository<TModel> : ImageRepositoryBase<TModel> where TModel : class
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IContentEnvironment _contentEnvironment;
 
-        public ImageRepository(IWebHostEnvironment webHostEnvironment)
+        public ImageRepository(IContentEnvironment contentEnvironment)
         {
-            _webHostEnvironment = webHostEnvironment;
+            _contentEnvironment = contentEnvironment;
         }
 
-        private string ImagesDirectory => Path.Combine(_webHostEnvironment.WebRootPath, FolderName);
+        private string ImagesDirectory => Path.Combine(_contentEnvironment.Path, FolderName);
 
         /// <summary>
         /// Возвращает результат сохранения файла изображения.
@@ -50,7 +49,7 @@ namespace Market.DAL.Repositories
                 }
 
                 string imageFileName = Guid.NewGuid().ToString() + "." + imageExtension;
-                string outputDirectory = _webHostEnvironment.WebRootPath + ImagesDirectory;
+                string outputDirectory = _contentEnvironment.Path + ImagesDirectory;
                 string writePath = outputDirectory + "\\" + imageFileName;
                 string outputPath = ImagesDirectory + "\\" + imageFileName;
                 Directory.CreateDirectory(outputDirectory);
@@ -91,7 +90,7 @@ namespace Market.DAL.Repositories
             }
 
             imgFileName = Path.GetFileName(imgFileName);
-            string deleteDirectory = _webHostEnvironment.WebRootPath + ImagesDirectory;
+            string deleteDirectory = _contentEnvironment.Path + ImagesDirectory;
 
             if (!Directory.Exists(deleteDirectory))
             {

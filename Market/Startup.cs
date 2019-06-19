@@ -1,4 +1,6 @@
 ﻿using Market.BLL.Extensions;
+using Market.DAL.Interfaces;
+using Market.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +29,7 @@ namespace Market
 
             #region DAL Services
 
+            services.AddTransient<IContentEnvironment, ContentEnvironment>();
             services.AddApplicationDbContext(Configuration.GetConnectionString("DefaultConnection"));
             services.AddApplicationIdentity();
 

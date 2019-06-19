@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Market.DAL.EF;
 using Market.DAL.Entities;
 using Market.DAL.Interfaces;
-using Microsoft.AspNetCore.Hosting;
 
 namespace Market.DAL.Repositories
 {
@@ -11,7 +10,7 @@ namespace Market.DAL.Repositories
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public EFUnitOfWork(ApplicationDbContext dbContext, IWebHostEnvironment webHostEnvironment)
+        public EFUnitOfWork(ApplicationDbContext dbContext, IContentEnvironment contentEnvironment)
         {
             _dbContext = dbContext;
 
@@ -25,7 +24,7 @@ namespace Market.DAL.Repositories
             Categories = new EfRepository<Category>(_dbContext);
             Countries = new EfRepository<Country>(_dbContext);
             Characteristics = new EfRepository<Characteristic>(_dbContext);
-            ProductsImages = new ImageRepository<Product>(webHostEnvironment);
+            ProductsImages = new ImageRepository<Product>(contentEnvironment);
         }
 
         public IRepository<Product> Products { get; }
