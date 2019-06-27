@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Market.BLL.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
@@ -8,24 +6,24 @@ namespace Market.BLL.Services
 {
     public class PasswordGenerator : IPasswordGenerator
     {
+        private readonly Random _rand = new Random(Environment.TickCount);
         private readonly PasswordOptions _passwordOptions;
+
+        private const string Uppercase = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
+        private const string Lowercase = "abcdefghijkmnopqrstuvwxyz";
+        private const string Digits = "0123456789";
+        private const string NonAlphaNumeric = "!@$?_-";
 
         public PasswordGenerator(PasswordOptions passwordOptions)
         {
-            _passwordOptions = passwordOptions;
-
-            if (passwordOptions == null)
+            _passwordOptions = passwordOptions ?? new PasswordOptions
             {
-                _passwordOptions = new PasswordOptions
-                {
-                    RequiredLength = 8,
-                    RequiredUniqueChars = 4,
-                    RequireDigit = true,
-                    RequireLowercase = true,
-                    RequireNonAlphanumeric = true,
-                    RequireUppercase = true
-                };
-            }
+                RequiredLength = 8,
+                RequireDigit = true,
+                RequireLowercase = true,
+                RequireNonAlphanumeric = true,
+                RequireUppercase = true
+            };
         }
 
         /// <summary>
@@ -33,49 +31,68 @@ namespace Market.BLL.Services
         /// </summary>
         public string Next()
         {
-            var randomChars = new[] {
-                "ABCDEFGHJKLMNOPQRSTUVWXYZ",
-                "abcdefghijkmnopqrstuvwxyz",
-                "0123456789",
-                "!@$?_-"
-            };
-
-            var rand = new Random(Environment.TickCount);
-            var chars = new List<char>();
+            Span<char> chars = stackalloc char[_passwordOptions.RequiredLength];
+            int defaultCount = 0;
 
             if (_passwordOptions.RequireUppercase)
             {
-                chars.Insert(rand.Next(0, chars.Count),
-                    randomChars[0][rand.Next(0, randomChars[0].Length)]);
+                defaultCount += RandomPut(chars, Uppercase[_rand.Next(0, Uppercase.Length)]);
             }
 
             if (_passwordOptions.RequireLowercase)
             {
-                chars.Insert(rand.Next(0, chars.Count),
-                    randomChars[1][rand.Next(0, randomChars[1].Length)]);
+                defaultCount += RandomPut(chars, Lowercase[_rand.Next(0, Lowercase.Length)]);
             }
 
             if (_passwordOptions.RequireDigit)
             {
-                chars.Insert(rand.Next(0, chars.Count),
-                    randomChars[2][rand.Next(0, randomChars[2].Length)]);
+                defaultCount += RandomPut(chars, Digits[_rand.Next(0, Digits.Length)]);
             }
 
             if (_passwordOptions.RequireNonAlphanumeric)
             {
-                chars.Insert(rand.Next(0, chars.Count),
-                    randomChars[3][rand.Next(0, randomChars[3].Length)]);
+                defaultCount += RandomPut(chars, NonAlphaNumeric[_rand.Next(0, NonAlphaNumeric.Length)]);
             }
 
-            for (int i = chars.Count; i < _passwordOptions.RequiredLength
-                || chars.Distinct().Count() < _passwordOptions.RequiredUniqueChars; i++)
+            while (defaultCount < chars.Length)
             {
-                string rcs = randomChars[rand.Next(0, randomChars.Length)];
-                chars.Insert(rand.Next(0, chars.Count),
-                    rcs[rand.Next(0, rcs.Length)]);
+                switch (_rand.Next(0, 4))
+                {
+                    case 0:
+                        defaultCount += RandomPut(chars, Uppercase[_rand.Next(0, Uppercase.Length)]);
+                        break;
+                    case 1:
+                        defaultCount += RandomPut(chars, Lowercase[_rand.Next(0, Lowercase.Length)]);
+                        break;
+                    case 2:
+                        defaultCount += RandomPut(chars, Digits[_rand.Next(0, Digits.Length)]);
+                        break;
+                    case 3:
+                        defaultCount += RandomPut(chars, NonAlphaNumeric[_rand.Next(0, NonAlphaNumeric.Length)]);
+                        break;
+                }
             }
 
-            return new string(chars.ToArray());
+            return new string(chars);
+        }
+
+        private int RandomPut(Span<char> chars, char value)
+        {
+            if (chars.Contains(value))
+            {
+                return 0;
+            }
+
+            int randomIndex = _rand.Next(0, chars.Length);
+
+            while (chars[randomIndex] != default)
+            {
+                randomIndex = _rand.Next(0, chars.Length);
+            }
+
+            chars[randomIndex] = value;
+
+            return 1;
         }
     }
 }
