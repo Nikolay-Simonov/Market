@@ -23,7 +23,7 @@ namespace Market.BLL.Services
 
         public async Task<IEnumerable<BrandDTO>> Brands()
         {
-            var brands = await _database.Brands.Items.Select(b => new BrandDTO
+            var brands = await _database.Brands.Select(b => new BrandDTO
             {
                 Id = b.Id,
                 Name = b.Name
@@ -35,7 +35,7 @@ namespace Market.BLL.Services
 
         public async Task<IEnumerable<CategoryDTO>> Categories()
         {
-            var categories = await _database.Categories.Items.Select(c => new CategoryDTO
+            var categories = await _database.Categories.Select(c => new CategoryDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -47,7 +47,7 @@ namespace Market.BLL.Services
 
         public async Task<IEnumerable<CountryDTO>> Countries()
         {
-            var countries = await _database.Countries.Items.Select(c => new CountryDTO
+            var countries = await _database.Countries.Select(c => new CountryDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -59,7 +59,7 @@ namespace Market.BLL.Services
 
         public async Task<IEnumerable<CharacteristicDTO>> Characteristics()
         {
-            var characteristics = await _database.Characteristics.Items.Select(c => new CharacteristicDTO
+            var characteristics = await _database.Characteristics.Select(c => new CharacteristicDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -71,7 +71,7 @@ namespace Market.BLL.Services
 
         public async Task<ProductsListDTO> Products(ProductsFiltersDTO filters)
         {
-            IQueryable<Product> products = _database.Products.Items;
+            IQueryable<Product> products = _database.Products;
 
             if (filters == null)
             {
@@ -93,7 +93,7 @@ namespace Market.BLL.Services
                 filters.Page = 1;
             }
 
-            if (filters.PageSize < 0)
+            if (filters.PageSize < 1)
             {
                 filters.PageSize = 1;
             }
@@ -162,7 +162,7 @@ namespace Market.BLL.Services
                     Id = p.Id,
                     Name = p.Name,
                     BrandId = p.BrandId,
-                    CategoryId = p.BrandId,
+                    CategoryId = p.CategoryId,
                     CountryId = p.CountryId,
                     Character = p.Character,
                     Description = p.Description,
@@ -211,7 +211,7 @@ namespace Market.BLL.Services
 
             if (product.CategoryId.HasValue)
             {
-                bool categoryExists = await _database.Categories.Items
+                bool categoryExists = await _database.Categories
                     .Select(c => c.Id)
                     .ContainsAsync(product.CategoryId.Value);
 
@@ -224,7 +224,7 @@ namespace Market.BLL.Services
 
             if (product.BrandId.HasValue)
             {
-                bool brandExists = await _database.Brands.Items
+                bool brandExists = await _database.Brands
                     .Select(c => c.Id)
                     .ContainsAsync(product.BrandId.Value);
 
@@ -237,7 +237,7 @@ namespace Market.BLL.Services
 
             if (product.CountryId.HasValue)
             {
-                bool countryExists = await _database.Countries.Items
+                bool countryExists = await _database.Countries
                     .Select(c => c.Id)
                     .ContainsAsync(product.CountryId.Value);
 
@@ -250,7 +250,7 @@ namespace Market.BLL.Services
 
             if (createModel.ProductCharacteristics != null && createModel.ProductCharacteristics.Count > 0)
             {
-                List<string> availableChars = await _database.Characteristics.Items
+                List<string> availableChars = await _database.Characteristics
                     .Select(c => c.Name).ToListAsync();
 
                 var validChars = new Dictionary<string, string>();
@@ -299,7 +299,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> Edit(ProductCreateDTO editModel)
         {
             if (editModel?.Product == null ||
-                !await _database.Products.Items.Select(p => p.Id).ContainsAsync(editModel.Product.Id))
+                !await _database.Products.Select(p => p.Id).ContainsAsync(editModel.Product.Id))
             {
                 return OperationResult(ResultType.Error, "Product not found.");
             }
@@ -321,7 +321,7 @@ namespace Market.BLL.Services
 
             if (product.CategoryId.HasValue)
             {
-                bool categoryExists = await _database.Categories.Items
+                bool categoryExists = await _database.Categories
                     .Select(c => c.Id)
                     .ContainsAsync(product.CategoryId.Value);
 
@@ -334,7 +334,7 @@ namespace Market.BLL.Services
 
             if (product.BrandId.HasValue)
             {
-                bool brandExists = await _database.Brands.Items
+                bool brandExists = await _database.Brands
                     .Select(c => c.Id)
                     .ContainsAsync(product.BrandId.Value);
 
@@ -347,7 +347,7 @@ namespace Market.BLL.Services
 
             if (product.CountryId.HasValue)
             {
-                bool countryExists = await _database.Countries.Items
+                bool countryExists = await _database.Countries
                     .Select(c => c.Id)
                     .ContainsAsync(product.CountryId.Value);
 
@@ -360,7 +360,7 @@ namespace Market.BLL.Services
 
             if (editModel.ProductCharacteristics != null && editModel.ProductCharacteristics.Count > 0)
             {
-                List<string> availableChars = await _database.Characteristics.Items
+                List<string> availableChars = await _database.Characteristics
                     .Select(c => c.Name).ToListAsync();
 
                 var validChars = new Dictionary<string, string>();
@@ -379,7 +379,7 @@ namespace Market.BLL.Services
                 product.Character = GetCharacteristicsFromDictionary(validChars);
             }
 
-            string oldFilePath = await _database.Products.Items.Where(p => p.Id == product.Id)
+            string oldFilePath = await _database.Products.Where(p => p.Id == product.Id)
                 .Select(p => p.Image).FirstOrDefaultAsync();
 
             if (!string.IsNullOrWhiteSpace(oldFilePath))

@@ -56,7 +56,7 @@ namespace Market.BLL.Services
                 filters.Page = 1;
             }
 
-            if (filters.PageSize < 0)
+            if (filters.PageSize < 1)
             {
                 filters.PageSize = 1;
             }

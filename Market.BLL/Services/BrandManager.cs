@@ -24,7 +24,7 @@ namespace Market.BLL.Services
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return await _database.Brands.Items.Select(b => new BrandDTO
+                return await _database.Brands.Select(b => new BrandDTO
                 {
                     Id = b.Id,
                     Name = b.Name
@@ -32,7 +32,7 @@ namespace Market.BLL.Services
                 }).ToArrayAsync();
             }
 
-            IEnumerable<BrandDTO> brands = await _database.Brands.Items.Select(b => new BrandDTO
+            IEnumerable<BrandDTO> brands = await _database.Brands.Select(b => new BrandDTO
             {
                 Id = b.Id,
                 Name = b.Name
@@ -77,7 +77,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> Edit(BrandDTO brand)
         {
             if (brand == null
-                || !await _database.Brands.Items.Select(b => b.Id).ContainsAsync(brand.Id))
+                || !await _database.Brands.Select(b => b.Id).ContainsAsync(brand.Id))
             {
                 return new OperationResult(ResultType.Error, "Brand doesn't exists");
             }
@@ -109,7 +109,7 @@ namespace Market.BLL.Services
             _database.Brands.Delete(brand);
             await _database.SaveChangesAsync();
 
-            bool brandExists = await _database.Brands.Items
+            bool brandExists = await _database.Brands
                 .Select(b => b.Id).ContainsAsync(id);
 
             return brandExists
@@ -119,7 +119,7 @@ namespace Market.BLL.Services
 
         public async Task<bool> BrandNotExists(string name)
         {
-            bool brandNotExists = !await _database.Brands.Items
+            bool brandNotExists = !await _database.Brands
                 .Select(b => b.Name).ContainsAsync(name);
 
             return brandNotExists;

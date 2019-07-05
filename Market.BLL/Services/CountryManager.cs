@@ -24,7 +24,7 @@ namespace Market.BLL.Services
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return await _database.Countries.Items.Select(c => new CountryDTO
+                return await _database.Countries.Select(c => new CountryDTO
                 {
                     Id = c.Id,
                     Name = c.Name
@@ -32,7 +32,7 @@ namespace Market.BLL.Services
                 }).ToArrayAsync();
             }
 
-            IEnumerable<CountryDTO> countries = await _database.Countries.Items.Select(c => new CountryDTO
+            IEnumerable<CountryDTO> countries = await _database.Countries.Select(c => new CountryDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -77,7 +77,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> Edit(CountryDTO country)
         {
             if (country == null
-                || !await _database.Countries.Items.Select(c => c.Id).ContainsAsync(country.Id))
+                || !await _database.Countries.Select(c => c.Id).ContainsAsync(country.Id))
             {
                 return new OperationResult(ResultType.Error, "Country doesn't exists");
             }
@@ -109,7 +109,7 @@ namespace Market.BLL.Services
             _database.Countries.Delete(country);
             await _database.SaveChangesAsync();
 
-            bool countryExists = await _database.Countries.Items
+            bool countryExists = await _database.Countries
                 .Select(c => c.Id).ContainsAsync(id);
 
             return countryExists
@@ -119,7 +119,7 @@ namespace Market.BLL.Services
 
         public async Task<bool> CountryNotExists(string name)
         {
-            bool countryNotExists = !await _database.Countries.Items
+            bool countryNotExists = !await _database.Countries
                 .Select(c => c.Name).ContainsAsync(name);
 
             return countryNotExists;

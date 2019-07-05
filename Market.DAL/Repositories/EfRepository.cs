@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Market.DAL.EF;
 using Market.DAL.Interfaces;
@@ -14,8 +18,6 @@ namespace Market.DAL.Repositories
         {
             _dbSet = dbContext.Set<TEntity>();
         }
-
-        public IQueryable<TEntity> Items => _dbSet;
 
         public async Task CreateAsync(TEntity item)
         {
@@ -33,5 +35,15 @@ namespace Market.DAL.Repositories
         {
             _dbSet.Update(item);
         }
+
+        public IEnumerator<TEntity> GetEnumerator() => (_dbSet as IQueryable<TEntity>).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => (_dbSet as IQueryable<TEntity>).GetEnumerator();
+
+        public Type ElementType => (_dbSet as IQueryable<TEntity>).ElementType;
+
+        public Expression Expression => (_dbSet as IQueryable<TEntity>).Expression;
+
+        public IQueryProvider Provider => (_dbSet as IQueryable<TEntity>).Provider;
     }
 }

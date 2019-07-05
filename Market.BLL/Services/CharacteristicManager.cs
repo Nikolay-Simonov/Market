@@ -24,7 +24,7 @@ namespace Market.BLL.Services
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return await _database.Characteristics.Items.Select(c => new CharacteristicDTO
+                return await _database.Characteristics.Select(c => new CharacteristicDTO
                 {
                     Id = c.Id,
                     Name = c.Name
@@ -32,7 +32,7 @@ namespace Market.BLL.Services
                 }).ToArrayAsync();
             }
 
-            IEnumerable<CharacteristicDTO> characteristics = await _database.Characteristics.Items.Select(c => new CharacteristicDTO
+            IEnumerable<CharacteristicDTO> characteristics = await _database.Characteristics.Select(c => new CharacteristicDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -77,7 +77,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> Edit(CharacteristicDTO characteristic)
         {
             if (characteristic == null
-                || !await _database.Characteristics.Items.Select(c => c.Id).ContainsAsync(characteristic.Id))
+                || !await _database.Characteristics.Select(c => c.Id).ContainsAsync(characteristic.Id))
             {
                 return new OperationResult(ResultType.Error, "Characteristic doesn't exists");
             }
@@ -109,7 +109,7 @@ namespace Market.BLL.Services
             _database.Characteristics.Delete(characteristic);
             await _database.SaveChangesAsync();
 
-            bool characteristicExists = await _database.Characteristics.Items
+            bool characteristicExists = await _database.Characteristics
                 .Select(c => c.Id).ContainsAsync(id);
 
             return characteristicExists
@@ -119,7 +119,7 @@ namespace Market.BLL.Services
 
         public async Task<bool> CharacteristicNotExists(string name)
         {
-            bool characteristicNotExists = !await _database.Characteristics.Items
+            bool characteristicNotExists = !await _database.Characteristics
                 .Select(c => c.Name).ContainsAsync(name);
 
             return characteristicNotExists;

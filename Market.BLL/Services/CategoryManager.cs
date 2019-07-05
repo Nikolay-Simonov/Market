@@ -24,7 +24,7 @@ namespace Market.BLL.Services
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return await _database.Categories.Items.Select(c => new CategoryDTO
+                return await _database.Categories.Select(c => new CategoryDTO
                 {
                     Id = c.Id,
                     Name = c.Name
@@ -32,7 +32,7 @@ namespace Market.BLL.Services
                 }).ToArrayAsync();
             }
 
-            IEnumerable<CategoryDTO> categories = await _database.Categories.Items.Select(c => new CategoryDTO
+            IEnumerable<CategoryDTO> categories = await _database.Categories.Select(c => new CategoryDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -77,7 +77,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> Edit(CategoryDTO category)
         {
             if (category == null
-                || !await _database.Categories.Items.Select(c => c.Id).ContainsAsync(category.Id))
+                || !await _database.Categories.Select(c => c.Id).ContainsAsync(category.Id))
             {
                 return new OperationResult(ResultType.Error, "Category doesn't exists");
             }
@@ -109,7 +109,7 @@ namespace Market.BLL.Services
             _database.Categories.Delete(category);
             await _database.SaveChangesAsync();
 
-            bool categoryExists = await _database.Categories.Items
+            bool categoryExists = await _database.Categories
                 .Select(c => c.Id).ContainsAsync(id);
 
             return categoryExists
@@ -119,7 +119,7 @@ namespace Market.BLL.Services
 
         public async Task<bool> CategoryNotExists(string name)
         {
-            bool categoryNotExists = !await _database.Categories.Items
+            bool categoryNotExists = !await _database.Categories
                 .Select(c => c.Name).ContainsAsync(name);
 
             return categoryNotExists;
