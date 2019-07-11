@@ -1,0 +1,49 @@
+@model FacetCriterionVM
+
+@if (!string.IsNullOrWhiteSpace(Model.Name) && Model.All != null
+     && Model.All.Count > 1)
+{
+    string bind = string.IsNullOrWhiteSpace(Model.BindingName)
+        ? Model.Name
+        : $"{Model.BindingName}[{Model.Name}]";
+
+    <div class="form-group">
+        <details open="open">
+        <summary><b>@Model.Name</b></summary>
+            @if (Model.Selected != null && Model.Selected.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (string value in Model.All)
+                    {
+                        if (Model.Selected.Contains(value))
+                        {
+                            <li>
+                                <input type="checkbox" name="@bind" value="@value" checked="checked"/>
+                                <label style="font-weight: normal" for="@bind">@value</label>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <input type="checkbox" name="@bind" value="@value"/>
+                                <label style="font-weight: normal" for="@bind">@value</label>
+                            </li>
+                        }
+                    }
+                </ul>
+            }
+            else
+            {
+                <ul class="list-unstyled">
+                    @foreach (string value in Model.All)
+                    {
+                        <li>
+                            <input type="checkbox" name="@bind" value="@value"/>
+                            <label style="font-weight: normal" for="@bind">@value</label>
+                        </li>
+                    }
+                </ul>
+            }
+        </details>
+    </div>
+}

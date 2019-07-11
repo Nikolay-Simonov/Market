@@ -12,18 +12,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Market.BLL.Services
 {
-    public class ProductManager : IProductManager
+    internal class ProductManager : AppManagerBase, IProductManager
     {
-        private readonly IUnitOfWork _database;
-
-        public ProductManager(IUnitOfWork database)
-        {
-            _database = database;
-        }
+        public ProductManager(IUnitOfWork database) : base(database) {}
 
         public async Task<IEnumerable<BrandDTO>> Brands()
         {
-            var brands = await _database.Brands.Select(b => new BrandDTO
+            var brands = await Database.Brands.Select(b => new BrandDTO
             {
                 Id = b.Id,
                 Name = b.Name
@@ -35,7 +30,7 @@ namespace Market.BLL.Services
 
         public async Task<IEnumerable<CategoryDTO>> Categories()
         {
-            var categories = await _database.Categories.Select(c => new CategoryDTO
+            var categories = await Database.Categories.Select(c => new CategoryDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -47,7 +42,7 @@ namespace Market.BLL.Services
 
         public async Task<IEnumerable<CountryDTO>> Countries()
         {
-            var countries = await _database.Countries.Select(c => new CountryDTO
+            var countries = await Database.Countries.Select(c => new CountryDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -59,7 +54,7 @@ namespace Market.BLL.Services
 
         public async Task<IEnumerable<CharacteristicDTO>> Characteristics()
         {
-            var characteristics = await _database.Characteristics.Select(c => new CharacteristicDTO
+            var characteristics = await Database.Characteristics.Select(c => new CharacteristicDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -71,7 +66,7 @@ namespace Market.BLL.Services
 
         public async Task<ProductsListDTO> Products(ProductsFiltersDTO filters)
         {
-            IQueryable<Product> products = _database.Products;
+            IQueryable<Product> products = Database.Products;
 
             if (filters == null)
             {
@@ -211,7 +206,7 @@ namespace Market.BLL.Services
 
             if (product.CategoryId.HasValue)
             {
-                bool categoryExists = await _database.Categories
+                bool categoryExists = await Database.Categories
                     .Select(c => c.Id)
                     .ContainsAsync(product.CategoryId.Value);
 
@@ -224,7 +219,7 @@ namespace Market.BLL.Services
 
             if (product.BrandId.HasValue)
             {
-                bool brandExists = await _database.Brands
+                bool brandExists = await Database.Brands
                     .Select(c => c.Id)
                     .ContainsAsync(product.BrandId.Value);
 
@@ -237,7 +232,7 @@ namespace Market.BLL.Services
 
             if (product.CountryId.HasValue)
             {
-                bool countryExists = await _database.Countries
+                bool countryExists = await Database.Countries
                     .Select(c => c.Id)
                     .ContainsAsync(product.CountryId.Value);
 
@@ -250,7 +245,7 @@ namespace Market.BLL.Services
 
             if (createModel.ProductCharacteristics != null && createModel.ProductCharacteristics.Count > 0)
             {
-                List<string> availableChars = await _database.Characteristics
+                List<string> availableChars = await Database.Characteristics
                     .Select(c => c.Name).ToListAsync();
 
                 var validChars = new Dictionary<string, string>();
@@ -271,7 +266,7 @@ namespace Market.BLL.Services
 
             if (createModel.ProductImage != null && createModel.ProductImage.Length > 0)
             {
-                ImageSaveResult saveResult = await _database.ProductsImages.Save(createModel.ProductImage);
+                ImageSaveResult saveResult = await Database.ProductsImages.Save(createModel.ProductImage);
 
                 if (saveResult.Type == ResultType.Success && !string.IsNullOrWhiteSpace(saveResult.OutputPath))
                 {
@@ -283,8 +278,8 @@ namespace Market.BLL.Services
                 }
             }
 
-            await _database.Products.CreateAsync(product);
-            await _database.SaveChangesAsync();
+            await Database.Products.CreateAsync(product);
+            await Database.SaveChangesAsync();
 
             ResultType type = messages.Any()
                 ? ResultType.Warning
@@ -299,7 +294,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> Edit(ProductCreateDTO editModel)
         {
             if (editModel?.Product == null ||
-                !await _database.Products.Select(p => p.Id).ContainsAsync(editModel.Product.Id))
+                !await Database.Products.Select(p => p.Id).ContainsAsync(editModel.Product.Id))
             {
                 return OperationResult(ResultType.Error, "Product not found.");
             }
@@ -321,7 +316,7 @@ namespace Market.BLL.Services
 
             if (product.CategoryId.HasValue)
             {
-                bool categoryExists = await _database.Categories
+                bool categoryExists = await Database.Categories
                     .Select(c => c.Id)
                     .ContainsAsync(product.CategoryId.Value);
 
@@ -334,7 +329,7 @@ namespace Market.BLL.Services
 
             if (product.BrandId.HasValue)
             {
-                bool brandExists = await _database.Brands
+                bool brandExists = await Database.Brands
                     .Select(c => c.Id)
                     .ContainsAsync(product.BrandId.Value);
 
@@ -347,7 +342,7 @@ namespace Market.BLL.Services
 
             if (product.CountryId.HasValue)
             {
-                bool countryExists = await _database.Countries
+                bool countryExists = await Database.Countries
                     .Select(c => c.Id)
                     .ContainsAsync(product.CountryId.Value);
 
@@ -360,7 +355,7 @@ namespace Market.BLL.Services
 
             if (editModel.ProductCharacteristics != null && editModel.ProductCharacteristics.Count > 0)
             {
-                List<string> availableChars = await _database.Characteristics
+                List<string> availableChars = await Database.Characteristics
                     .Select(c => c.Name).ToListAsync();
 
                 var validChars = new Dictionary<string, string>();
@@ -379,12 +374,12 @@ namespace Market.BLL.Services
                 product.Character = GetCharacteristicsFromDictionary(validChars);
             }
 
-            string oldFilePath = await _database.Products.Where(p => p.Id == product.Id)
+            string oldFilePath = await Database.Products.Where(p => p.Id == product.Id)
                 .Select(p => p.Image).FirstOrDefaultAsync();
 
             if (!string.IsNullOrWhiteSpace(oldFilePath))
             {
-                OperationResult deleteResult = _database.ProductsImages.Delete(oldFilePath);
+                OperationResult deleteResult = Database.ProductsImages.Delete(oldFilePath);
 
                 if (deleteResult.Type != ResultType.Success
                     && deleteResult.Messages != null && deleteResult.Any())
@@ -395,7 +390,7 @@ namespace Market.BLL.Services
 
             if (editModel.ProductImage != null && editModel.ProductImage.Length > 0)
             {
-                ImageSaveResult saveResult = await _database.ProductsImages.Save(editModel.ProductImage);
+                ImageSaveResult saveResult = await Database.ProductsImages.Save(editModel.ProductImage);
 
                 if (saveResult.Type == ResultType.Success && !string.IsNullOrWhiteSpace(saveResult.OutputPath))
                 {
@@ -407,8 +402,8 @@ namespace Market.BLL.Services
                 }
             }
 
-            _database.Products.Update(product);
-            await _database.SaveChangesAsync();
+            Database.Products.Update(product);
+            await Database.SaveChangesAsync();
 
             ResultType type = messages.Any()
                 ? ResultType.Warning
@@ -419,7 +414,7 @@ namespace Market.BLL.Services
 
         public async Task<ProductDTO> GetAsync(int id)
         {
-            Product product = await _database.Products.GetAsync(id);
+            Product product = await Database.Products.GetAsync(id);
 
             if (product == null || product.Id != id)
             {
@@ -476,7 +471,7 @@ namespace Market.BLL.Services
         /// </summary>
         public async Task<OperationResult> Remove(int id)
         {
-            Product product = await _database.Products.GetAsync(id);
+            Product product = await Database.Products.GetAsync(id);
 
             if (product == null || product.Id != id || product.Removed)
             {
@@ -485,8 +480,8 @@ namespace Market.BLL.Services
 
             product.Removed = true;
 
-            _database.Products.Update(product);
-            await _database.SaveChangesAsync();
+            Database.Products.Update(product);
+            await Database.SaveChangesAsync();
 
             return OperationResult(ResultType.Success);
         }
@@ -496,7 +491,7 @@ namespace Market.BLL.Services
         /// </summary>
         public async Task<OperationResult> Restore(int id)
         {
-            Product product = await _database.Products.GetAsync(id);
+            Product product = await Database.Products.GetAsync(id);
 
             if (product == null || product.Id != id || !product.Removed)
             {
@@ -505,8 +500,8 @@ namespace Market.BLL.Services
 
             product.Removed = false;
 
-            _database.Products.Update(product);
-            await _database.SaveChangesAsync();
+            Database.Products.Update(product);
+            await Database.SaveChangesAsync();
 
             return OperationResult(ResultType.Success);
         }
@@ -569,31 +564,5 @@ namespace Market.BLL.Services
         {
             return new OperationResult(type, messages.ToArray());
         }
-
-        #region IDisposable Support
-
-        private bool _disposedValue;
-
-        private void Dispose(bool disposing)
-        {
-            if (_disposedValue)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                _database.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        #endregion
     }
 }

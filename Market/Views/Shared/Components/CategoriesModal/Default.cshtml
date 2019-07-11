@@ -1,0 +1,72 @@
+@model IEnumerable<string>
+
+<div id="CategoriesModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Categories</h4>
+            </div>
+            <div class="modal-body">
+                @if (Model == null || !Model.Any())
+                {
+                    <h2>No categories.</h2>
+                }
+                else
+                {
+                    string[] categories = Model.ToArray();
+
+                    for (int i = 0; i < categories.Length; i += 4)
+                    {
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong>
+                                    <a asp-controller="Catalog" asp-action="Products"
+                                       asp-route-category="@categories[i]">
+                                        @categories[i]
+                                    </a>
+                                </strong>
+                            </div>
+                            <div class="col-md-3">
+                                @if (i + 1 < categories.Length)
+                                {
+                                    <strong>
+                                        <a asp-controller="Catalog" asp-action="Products"
+                                           asp-route-category="@categories[i + 1]">
+                                            @categories[i + 1]
+                                        </a>
+                                    </strong>
+                                }
+                            </div>
+                            <div class="col-md-3">
+                                @if (i + 2 < categories.Length)
+                                {
+                                    <strong>
+                                        <a asp-controller="Catalog" asp-action="Products"
+                                           asp-route-category="@categories[i + 2]">
+                                            @categories[i + 2]
+                                        </a>
+                                    </strong>
+                                }
+                            </div>
+                            <div class="col-md-3">
+                                @if (i + 3 < categories.Length)
+                                {
+                                    <strong>
+                                        <a asp-controller="Catalog" asp-action="Products"
+                                           asp-route-category="@categories[i + 3]">
+                                            @categories[i + 3]
+                                        </a>
+                                    </strong>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

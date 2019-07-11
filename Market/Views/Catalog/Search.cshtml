@@ -1,0 +1,55 @@
+@model SearchResultsVM
+
+@{
+    ViewData["Title"] = "Search results";
+}
+
+<h3>@ViewData["Title"]</h3>
+<div class="container">
+    @if (Model.Products == null || !Model.Products.Any())
+    {
+        <h2>Nothing found by request.</h2>
+    }
+    else
+    {
+        ProductShortVM[] products = Model.Products.ToArray();
+
+        for (int i = 0; i < products.Length; i += 3)
+        {
+            <div class="row">
+                <div class="col-md-4">
+                    @{ await Html.RenderPartialAsync("_ProductShort", products[i]); }
+                </div>
+                <div class="col-md-4">
+                    @if (i + 1 < products.Length)
+                    {
+                        await Html.RenderPartialAsync("_ProductShort", products[i + 1]);
+                    }
+                </div>
+                <div class="col-md-4">
+                    @if (i + 2 < products.Length)
+                    {
+                        await Html.RenderPartialAsync("_ProductShort", products[i + 2]);
+                    }
+                </div>
+            </div>
+        }
+    }
+    <div class="row" style="margin-top: 10px">
+        <div class="col-md-12">
+            <div class="form-group pull-right">
+                <div class="btn-group" paging-info="@Model.PagingInfo" page-action="Search"
+                     page-class="btn" page-class-normal="btn-secondary" page-class-selected="btn-primary"
+                     button-text="Navigate" enable-arrows="true">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.col-md-4 {
+    margin-right: -5px; !important;
+    margin-left: -5px; !important;
+}
+</style>

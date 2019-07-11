@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
@@ -86,12 +87,13 @@ namespace Market.Infrastructure
 
             IUrlHelper urlHelper = _urlHelperFactory.GetUrlHelper(ViewContext);
             var div = new TagBuilder("div");
+            div.Attributes["style"] = "display: flex";
 
             // Получаем данные модели
             var modelState =
                 urlHelper.ActionContext?.ModelState ?? new ModelStateDictionary();
 
-            var models = new Dictionary<string, string>();
+            var models = new Dictionary<string, object>();
             var pagePresent = false;
 
             foreach (var (key, value) in modelState)
@@ -102,7 +104,7 @@ namespace Market.Infrastructure
                     continue;
                 }
 
-                models.Add(key, value.AttemptedValue);
+                models.Add(key, value.RawValue);
             }
 
             if (!pagePresent)
@@ -195,8 +197,6 @@ namespace Market.Infrastructure
             // то генерируем форму для навигации
             if (PagingInfo.TotalPages > MaxPagesLine)
             {
-                // Рендер позволяет заранее установить высоту
-                div.RenderBody();
                 var form = new TagBuilder("form");
                 form.Attributes["method"] = "get";
                 form.Attributes["action"] = urlHelper.Action(PageAction);
@@ -209,14 +209,34 @@ namespace Market.Infrastructure
                         continue;
                     }
 
-                    var hidden = new TagBuilder("input");
-                    hidden.Attributes["type"] = "hidden";
-                    hidden.Attributes["id"] = key;
-                    hidden.Attributes["name"] = key;
-                    hidden.Attributes["value"] = value;
-
-                    form.InnerHtml.AppendHtml(hidden);
+                    if (value is IEnumerable<string> stringValues)
+                    {
+                        foreach (string stringValue in stringValues)
+                        {
+                            var hidden = new TagBuilder("input");
+                            hidden.Attributes["type"] = "hidden";
+                            hidden.Attributes["id"] = key;
+                            hidden.Attributes["name"] = key;
+                            hidden.Attributes["value"] = stringValue;
+                            form.InnerHtml.AppendHtml(hidden);
+                        }
+                    }
+                    else
+                    {
+                        var hidden = new TagBuilder("input");
+                        hidden.Attributes["type"] = "hidden";
+                        hidden.Attributes["id"] = key;
+                        hidden.Attributes["name"] = key;
+                        hidden.Attributes["value"] = value.ToString();
+                        form.InnerHtml.AppendHtml(hidden);
+                    }
                 }
+
+                var inputGroup = new TagBuilder("div");
+                inputGroup.AddCssClass("input-group");
+
+                var inputGroupBtn = new TagBuilder("div");
+                inputGroupBtn.AddCssClass("input-group-btn");
 
                 var input = new TagBuilder("input");
                 input.Attributes["type"] = "number";
@@ -224,23 +244,24 @@ namespace Market.Infrastructure
                 input.Attributes["id"] = "Page";
                 input.Attributes["min"] = "1";
                 input.Attributes["max"] = PagingInfo.TotalPages.ToString();
-                input.Attributes["dir"] = "rtl";
-                input.Attributes["style"] = "margin-left: 5px;margin-right: 5px;"
-                    + "text-align: right;height: 100%;width: 50px;";
-                input.Attributes["height"] = "100%";
+                input.Attributes["class"] = "form-control";
                 input.Attributes["value"] = PagingInfo.CurrentPage.ToString();
 
                 var submit = new TagBuilder("button");
                 submit.Attributes["type"] = "submit";
                 submit.InnerHtml.Append(ButtonText);
+                submit.AddCssClass(PageClassSelected);
                 submit.AddCssClass(PageClass);
-                submit.AddCssClass(PageClassNormal);
 
-                form.InnerHtml.AppendHtml(input);
-                form.InnerHtml.AppendHtml(submit);
+                inputGroupBtn.InnerHtml.AppendHtml(submit);
+                inputGroup.InnerHtml.AppendHtml(input);
+                inputGroup.InnerHtml.AppendHtml(inputGroupBtn);
+
+                form.InnerHtml.AppendHtml(inputGroup);
                 div.InnerHtml.AppendHtml(form);
             }
 
+            output.MergeAttributes(div);
             output.Content.AppendHtml(div.InnerHtml);
         }
     }

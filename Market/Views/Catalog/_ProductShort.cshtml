@@ -1,0 +1,66 @@
+@using System.Globalization
+@model ProductShortVM
+
+<div class="product-item">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong><a asp-action="Product" asp-route-id="@Model.Id">@Model.Name</a></strong>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="min-height: 171px">
+        @if (!string.IsNullOrWhiteSpace(Model.Image))
+        {
+            <div class="col-md-4">
+                <div class="form-group">
+                    <img class="product-img center-block" src="@Model.Image" alt="Product image"/>
+                </div>
+            </div>
+        }
+        <div class="col-md-8">
+            <div class="form-group">
+                <label asp-for="Brand" class="control-label"></label>
+                @Html.DisplayTextFor(m => m.Brand)
+            </div>
+            <div class="form-group">
+                <label asp-for="Country" class="control-label"></label>
+                @Html.DisplayTextFor(m => m.Country)
+            </div>
+            <div class="form-group">
+                <label asp-for="Weight" class="control-label"></label>
+                @Html.DisplayTextFor(m => m.Weight) kg
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                @Html.DisplayTextFor(m => m.Price) @CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group pull-right">
+                <button class="btn btn-success">
+                    Add to cart
+                    <span class="glyphicon glyphicon-shopping-cart"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.product-img {
+    max-height: 156px;
+    max-width: 120px;
+}
+
+.product-item {
+    margin-top: 10px;
+    padding: 10px;
+    border: thin solid #0d46a0;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+</style>

@@ -18,6 +18,8 @@ namespace Market.DAL.Interfaces
 
         ImageRepositoryBase<Product> ProductsImages { get; }
 
+        ICatalogRepository Catalog { get; }
+
         Task SaveChangesAsync();
     }
 }

@@ -1,0 +1,228 @@
+@using System.Globalization
+@model CatalogVM
+
+@if (!string.IsNullOrEmpty(Model.Category))
+{
+    ViewData["Title"] = Model.Category;
+    <h2>@ViewData["Title"]</h2>
+}
+<form asp-action="Products" method="get">
+    <input type="hidden" asp-for="Category"/>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group form-inline pull-right" style="margin-left: 10px">
+                <label asp-for="SortingDirection" class="control-label"></label>
+                <select asp-for="SortingDirection"
+                        asp-items="new SelectList(Model.SortingDirection.GetType().GetEnumNames())"
+                        class="form-control">
+                </select>
+            </div>
+            <div class="form-group form-inline pull-right">
+                <label asp-for="SortField" class="control-label"></label>
+                <select asp-for="SortField"
+                        asp-items="new SelectList(Model.SortField.GetType().GetEnumNames())"
+                        class="form-control">
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3" style="margin-top: 10px">
+            <div class="form-group">
+                <button type="submit" class="btn btn-success btn-block">Filter</button>
+            </div>
+            @if (Model.MaxPrice > Model.MinPrice)
+            {
+                <div class="form-group">
+                    <label class="control-label">Price</label>
+                    <div class="range-slider">
+                        <input id="PriceSlider" type="text" class="js-range-slider" value=""/>
+                    </div>
+                    <div class="extra-controls">
+                        <input type="hidden" asp-for="StartPrice" class="js-input-from" value="0"/>
+                        <input type="hidden" asp-for="EndPrice" class="js-input-to" value="0"/>
+                    </div>
+                </div>
+            }
+            @if (Model.MaxWeight > Model.MinWeight)
+            {
+                <div class="form-group">
+                    <label class="control-label">Weight</label>
+                    <div class="range-slider">
+                        <input id="WeightSlider" type="text" class="js-range-slider" value=""/>
+                    </div>
+                    <div class="extra-controls">
+                        <input type="hidden" asp-for="StartWeight" class="js-input-from" value="0"/>
+                        <input type="hidden" asp-for="EndWeight" class="js-input-to" value="0"/>
+                    </div>
+                </div>
+            }
+            @foreach (var criterion in Model.FacetsCriteries)
+            {
+                await Html.RenderPartialAsync("FacetCriterion", criterion);
+            }
+        </div>
+        <div class="col-md-9">
+            @if (Model.Products == null || !Model.Products.Any())
+            {
+                <h2>Nothing found by request.</h2>
+            }
+            else
+            {
+                ProductShortVM[] products = Model.Products.ToArray();
+
+                for (int i = 0; i < products.Length; i += 2)
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            @{ await Html.RenderPartialAsync("_ProductShort", products[i]); }
+                        </div>
+                        <div class="col-md-6">
+                            @if (i + 1 < products.Length)
+                            {
+                                await Html.RenderPartialAsync("_ProductShort", products[i + 1]);
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</form>
+<div class="row" style="margin-top: 10px">
+    <div class="col-md-12">
+        <div class="form-group pull-left">
+            <div class="btn-group m-1" paging-info="@Model.PagingInfo" page-action="Products"
+                 page-class="btn" page-class-normal="btn-secondary" page-class-selected="btn-primary"
+                 button-text="Navigate" enable-arrows="true">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section RangeSlider
+{
+    @{ await Html.RenderPartialAsync("_RangeSliderPartial"); }
+}
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        // Price
+        let $price = $("#PriceSlider"),
+            $startPrice = $("#@(nameof(Model.StartPrice))"),
+            $endPrice = $("#@(nameof(Model.EndPrice))"),
+            priceInstance;
+
+        $price.ionRangeSlider({
+        	skin: "round",
+            type: "decimal",
+            min: @(Model.MinPrice),
+            max: @(Model.MaxPrice),
+            from: @(Model.StartPrice == null || Model.StartPrice < Model.MinPrice ? Model.MinPrice : Model.StartPrice),
+            to: @(Model.EndPrice == null || Model.EndPrice < Model.MaxPrice ? Model.MaxPrice : Model.EndPrice),
+            step: 0.1,
+            prefix: "@(CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol)",
+            onStart: updatePrices,
+            onChange: updatePrices
+        });
+
+        priceInstance = $price.data("ionRangeSlider");
+
+        function updatePrices (data) {
+        	from = data.from;
+            to = data.to;
+
+            $startPrice.prop("value", from);
+            $endPrice.prop("value", to);
+        }
+
+        $startPrice.on("input", function () {
+            let val = $(this).prop("value");
+
+            // validate
+            if (val < min) {
+                val = min;
+            } else if (val > to) {
+                val = to;
+            }
+
+            priceInstance.update({
+                from: val
+            });
+        });
+
+        $endPrice.on("input", function () {
+            let val = $(this).prop("value");
+
+            // validate
+            if (val < from) {
+                val = from;
+            } else if (val > max) {
+                val = max;
+            }
+
+            priceInstance.update({
+                to: val
+            });
+        });
+
+        // Weight
+        let $weight = $("#WeightSlider"),
+            $startWeight = $("#@(nameof(Model.StartWeight))"),
+            $endWeight = $("#@(nameof(Model.EndWeight))"),
+            weightInstance;
+
+        $weight.ionRangeSlider({
+            skin: "round",
+            type: "double",
+            min: @(Model.MinWeight),
+            max: @(Model.MaxWeight),
+            from: @(Model.StartWeight == null || Model.StartWeight < Model.MinWeight ? Model.MinWeight : Model.StartWeight),
+            to: @(Model.EndWeight == null || Model.EndWeight < Model.MaxWeight ? Model.MaxWeight : Model.EndWeight),
+            step: 0.01,
+            postfix: " kg",
+            onStart: updateWeights,
+            onChange: updateWeights
+        });
+
+        weightInstance = $weight.data("ionRangeSlider");
+
+        function updateWeights (data) {
+            from = data.from;
+            to = data.to;
+
+            $startWeight.prop("value", from);
+            $endWeight.prop("value", to);
+        }
+
+        $startWeight.on("input", function () {
+            let val = $(this).prop("value");
+
+            // validate
+            if (val < min) {
+                val = min;
+            } else if (val > to) {
+                val = to;
+            }
+
+            weightInstance.update({
+                from: val
+            });
+        });
+
+        $endWeight.on("input", function () {
+            let val = $(this).prop("value");
+
+            // validate
+            if (val < from) {
+                val = from;
+            } else if (val > max) {
+                val = max;
+            }
+
+            weightInstance.update({
+                to: val
+            });
+        });
+    });
+</script>

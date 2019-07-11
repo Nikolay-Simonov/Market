@@ -11,20 +11,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Market.BLL.Services
 {
-    public class BrandManager : IBrandManager
+    internal class BrandManager : AppManagerBase, IBrandManager
     {
-        private readonly IUnitOfWork _database;
-
-        public BrandManager(IUnitOfWork database)
-        {
-            _database = database;
-        }
+        public BrandManager(IUnitOfWork database) : base(database) {}
 
         public async Task<IEnumerable<BrandDTO>> Brands(string name = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return await _database.Brands.Select(b => new BrandDTO
+                return await Database.Brands.Select(b => new BrandDTO
                 {
                     Id = b.Id,
                     Name = b.Name
@@ -32,7 +27,7 @@ namespace Market.BLL.Services
                 }).ToArrayAsync();
             }
 
-            IEnumerable<BrandDTO> brands = await _database.Brands.Select(b => new BrandDTO
+            IEnumerable<BrandDTO> brands = await Database.Brands.Select(b => new BrandDTO
             {
                 Id = b.Id,
                 Name = b.Name
@@ -44,7 +39,7 @@ namespace Market.BLL.Services
 
         public async Task<BrandDTO> GetAsync(int id)
         {
-            Brand brand = await _database.Brands.GetAsync(id);
+            Brand brand = await Database.Brands.GetAsync(id);
 
             if (brand == null || brand.Id != id)
             {
@@ -65,11 +60,11 @@ namespace Market.BLL.Services
                 return new OperationResult(ResultType.Error, "Brand already exists");
             }
 
-            await _database.Brands.CreateAsync(new Brand
+            await Database.Brands.CreateAsync(new Brand
             {
                 Name = name
             });
-            await _database.SaveChangesAsync();
+            await Database.SaveChangesAsync();
 
             return new OperationResult(ResultType.Success);
         }
@@ -77,7 +72,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> Edit(BrandDTO brand)
         {
             if (brand == null
-                || !await _database.Brands.Select(b => b.Id).ContainsAsync(brand.Id))
+                || !await Database.Brands.Select(b => b.Id).ContainsAsync(brand.Id))
             {
                 return new OperationResult(ResultType.Error, "Brand doesn't exists");
             }
@@ -87,29 +82,29 @@ namespace Market.BLL.Services
                 return new OperationResult(ResultType.Error, "Brand already exists");
             }
 
-            _database.Brands.Update(new Brand
+            Database.Brands.Update(new Brand
             {
                 Id = brand.Id,
                 Name = brand.Name
             });
-            await _database.SaveChangesAsync();
+            await Database.SaveChangesAsync();
 
             return new OperationResult(ResultType.Success);
         }
 
         public async Task<OperationResult> Delete(int id)
         {
-            Brand brand = await _database.Brands.GetAsync(id);
+            Brand brand = await Database.Brands.GetAsync(id);
 
             if (brand == null || brand.Id != id)
             {
                 return new OperationResult(ResultType.Warning, "Brand doesn't exists");
             }
 
-            _database.Brands.Delete(brand);
-            await _database.SaveChangesAsync();
+            Database.Brands.Delete(brand);
+            await Database.SaveChangesAsync();
 
-            bool brandExists = await _database.Brands
+            bool brandExists = await Database.Brands
                 .Select(b => b.Id).ContainsAsync(id);
 
             return brandExists
@@ -119,36 +114,10 @@ namespace Market.BLL.Services
 
         public async Task<bool> BrandNotExists(string name)
         {
-            bool brandNotExists = !await _database.Brands
+            bool brandNotExists = !await Database.Brands
                 .Select(b => b.Name).ContainsAsync(name);
 
             return brandNotExists;
         }
-
-        #region IDisposable Support
-
-        private bool _disposedValue;
-
-        private void Dispose(bool disposing)
-        {
-            if (_disposedValue)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                _database.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        #endregion
     }
 }

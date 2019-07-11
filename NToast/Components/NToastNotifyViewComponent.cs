@@ -30,7 +30,8 @@ namespace NToastNotify
                 DisableAjaxToasts = _nToastNotifyOption.DisableAjaxToasts,
                 Hash = Utils.GetEmbeddedFileProvider().GetFileInfo($"js.dist.{_library.VarName}.js").LastModified.DateTime.ToString("yyyyMMddhhss")
             };
-            return View("Default", model);
+
+            return View(model);
         }
 
         public string JsonOrUndefined(object obj)

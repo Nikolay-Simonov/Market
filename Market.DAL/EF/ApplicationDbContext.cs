@@ -24,10 +24,22 @@ namespace Market.DAL.EF
         {
             base.OnModelCreating(builder);
             builder.Entity<Country>().HasIndex(c => c.Name).IsUnique();
-            builder.Entity<Brand>().HasIndex(c => c.Name).IsUnique();
-            builder.Entity<Category>().HasIndex(c => c.Name).IsUnique();
             builder.Entity<Characteristic>().HasIndex(c => c.Name).IsUnique();
             builder.Entity<Product>().Property(p => p.Character).HasColumnType("xml");
+
+            builder.Entity<Brand>(brand =>
+            {
+                brand.HasMany(b => b.Products)
+                    .WithOne(p => p.Brand).OnDelete(DeleteBehavior.SetNull);
+                brand.HasIndex(c => c.Name).IsUnique();
+            });
+
+            builder.Entity<Category>(category =>
+            {
+                category.HasMany(c => c.Products)
+                    .WithOne(p => p.Category).OnDelete(DeleteBehavior.SetNull);
+                category.HasIndex(c => c.Name).IsUnique();
+            });
 
             builder.Entity<ApplicationUserRole>(userRole =>
             {

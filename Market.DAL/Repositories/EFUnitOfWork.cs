@@ -25,6 +25,7 @@ namespace Market.DAL.Repositories
             Countries = new EfRepository<Country>(_dbContext);
             Characteristics = new EfRepository<Characteristic>(_dbContext);
             ProductsImages = new ImageRepository<Product>(contentEnvironment);
+            Catalog = new CatalogRepository(_dbContext);
         }
 
         public IRepository<Product> Products { get; }
@@ -38,6 +39,8 @@ namespace Market.DAL.Repositories
         public IRepository<Characteristic> Characteristics { get; }
 
         public ImageRepositoryBase<Product> ProductsImages { get; }
+
+        public ICatalogRepository Catalog { get; }
 
         public async Task SaveChangesAsync()
         {

@@ -31,6 +31,7 @@ namespace Market.BLL.Extensions
             services.AddScoped<IBrandManager, BrandManager>();
             services.AddScoped<IStaffManager, StaffManager>();
             services.AddScoped<IProductManager, ProductManager>();
+            services.AddScoped<ICatalogManager, CatalogManager>();
         }
 
         public static void AddPasswordGenerator(this IServiceCollection services)
@@ -40,16 +41,6 @@ namespace Market.BLL.Extensions
                 var passwordOptions = x.GetRequiredService<UserManager<ApplicationUser>>().Options.Password;
                 return new PasswordGenerator(passwordOptions);
             });
-        }
-
-        public static void AddApplicationDbContext(this IServiceCollection services, string connectionString)
-        {
-            DAL.Extensions.ServiceProviderExtensions.AddApplicationDbContext(services, connectionString);
-        }
-
-        public static void AddApplicationIdentity(this IServiceCollection services)
-        {
-            DAL.Extensions.ServiceProviderExtensions.AddApplicationIdentity(services);
         }
     }
 }

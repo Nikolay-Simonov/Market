@@ -24,25 +24,26 @@
     color: #F44336;
 }
 
+.navbar.navbar-inverse.navbar-fixed-top * :not(input) {
+    color: white;
+}
+
+.navbar-toggle {
+    background-color: #002071 !important;
+    border-color: #002071 !important;
+}
+
+.navbar-inverse {
+    background-color: #0d46a0;
+    border-color: #0d46a0;
+}
+
 .navbar-nav li:hover {
-    background-color: #FF3D00;
-    border-color: #DD2C00;
+    background-color: #002071;
+    border-color: #002071;
 }
 
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
     background-color: #FFF3E0;
-}
-
-.btn-primary {
-    background-color: #FF3D00;
-    border: #DD2C00;
-}
-
-.btn-primary:focus,
-.btn-primary:hover,
-.btn-primary:active,
-.btn-primary:active:hover {
-    background-color: #DD2C00;
-    border-color: #DD2C00;
 }

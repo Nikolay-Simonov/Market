@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using Market.DAL.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
 
@@ -36,11 +35,6 @@ namespace Market.BLL.Extensions
                     ci
                 }
             });
-        }
-
-        public static void EnsureAdmin(this IApplicationBuilder app)
-        {
-            SeedData.EnsureAdmin(app);
         }
     }
 }

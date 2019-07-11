@@ -1,4 +1,5 @@
 ﻿using Market.BLL.Extensions;
+using Market.DAL.Extensions;
 using Market.DAL.Interfaces;
 using Market.Services;
 using Microsoft.AspNetCore.Builder;
@@ -32,6 +33,7 @@ namespace Market
             services.AddTransient<IContentEnvironment, ContentEnvironment>();
             services.AddApplicationDbContext(Configuration.GetConnectionString("DefaultConnection"));
             services.AddApplicationIdentity();
+            services.AddFacetsSearch();
 
             #endregion
 

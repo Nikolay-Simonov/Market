@@ -1,0 +1,102 @@
+@using System.Globalization
+@using Market.BLL.Interfaces
+@model ProductVM
+@inject IProductManager ProductManager
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="container">
+    <div class="row">
+        @if (!string.IsNullOrWhiteSpace(Model.Image))
+        {
+            <div class="col-md-12">
+                <img style="max-height: 300px" src="@Model.Image" alt="@Model.Name"/>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                @Html.DisplayTextFor(m => m.Price) @CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol
+            </div>
+            <div class="form-group">
+                <label asp-for="Weight" class="control-label"></label>
+                @Html.DisplayTextFor(m => m.Weight) kg
+            </div>
+        </div>
+        <div class="col-md-8">
+            @if (Model.Brand != null && !string.IsNullOrWhiteSpace(Model.Brand.Name))
+            {
+
+                <div class="form-group">
+                    <label asp-for="Brand.Name" class="control-label"></label>
+                    @Html.DisplayTextFor(m => m.Brand.Name)
+                </div>
+            }
+            @if (Model.Brand != null && !string.IsNullOrWhiteSpace(Model.Country.Name))
+            {
+
+                <div class="form-group">
+                    <label asp-for="Country.Name" class="control-label"></label>
+                    @Html.DisplayTextFor(m => m.Country.Name)
+                </div>
+            }
+        </div>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <textarea readonly="readonly" asp-for="Description" class="form-control"></textarea>
+                </div>
+            </div>
+        </div>
+    }
+    @{
+        var characteristics = ProductManager.GetCharacteristicsFromXml(Model.Character);
+
+        if (characteristics != null && characteristics.Any())
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Characteristics</h3>
+                    <ul class="list-group">
+                        @foreach (var (name, value) in characteristics)
+                        {
+                            <li class="list-group-item">
+                                <b>@name:</b>
+                                @value
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    }
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <div class="form-group pull-right">
+                    <button class="btn btn-success">
+                        Add to cart
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+textarea {
+    max-width: 100%;
+    min-width: 100%;
+    min-height: auto;
+    resize: none;
+}
+</style>

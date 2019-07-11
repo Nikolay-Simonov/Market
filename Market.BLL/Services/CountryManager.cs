@@ -11,20 +11,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Market.BLL.Services
 {
-    public class CountryManager : ICountryManager
+    internal class CountryManager : AppManagerBase, ICountryManager
     {
-        private readonly IUnitOfWork _database;
-
-        public CountryManager(IUnitOfWork database)
-        {
-            _database = database;
-        }
+        public CountryManager(IUnitOfWork database) : base(database) {}
 
         public async Task<IEnumerable<CountryDTO>> Countries(string name = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return await _database.Countries.Select(c => new CountryDTO
+                return await Database.Countries.Select(c => new CountryDTO
                 {
                     Id = c.Id,
                     Name = c.Name
@@ -32,7 +27,7 @@ namespace Market.BLL.Services
                 }).ToArrayAsync();
             }
 
-            IEnumerable<CountryDTO> countries = await _database.Countries.Select(c => new CountryDTO
+            IEnumerable<CountryDTO> countries = await Database.Countries.Select(c => new CountryDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -44,7 +39,7 @@ namespace Market.BLL.Services
 
         public async Task<CountryDTO> GetAsync(int id)
         {
-            Country country = await _database.Countries.GetAsync(id);
+            Country country = await Database.Countries.GetAsync(id);
 
             if (country == null || country.Id != id)
             {
@@ -65,11 +60,11 @@ namespace Market.BLL.Services
                 return new OperationResult(ResultType.Error, "Country already exists");
             }
 
-            await _database.Countries.CreateAsync(new Country
+            await Database.Countries.CreateAsync(new Country
             {
                 Name = name
             });
-            await _database.SaveChangesAsync();
+            await Database.SaveChangesAsync();
 
             return new OperationResult(ResultType.Success);
         }
@@ -77,7 +72,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> Edit(CountryDTO country)
         {
             if (country == null
-                || !await _database.Countries.Select(c => c.Id).ContainsAsync(country.Id))
+                || !await Database.Countries.Select(c => c.Id).ContainsAsync(country.Id))
             {
                 return new OperationResult(ResultType.Error, "Country doesn't exists");
             }
@@ -87,29 +82,29 @@ namespace Market.BLL.Services
                 return new OperationResult(ResultType.Error, "Country already exists");
             }
 
-            _database.Countries.Update(new Country
+            Database.Countries.Update(new Country
             {
                 Id = country.Id,
                 Name = country.Name
             });
-            await _database.SaveChangesAsync();
+            await Database.SaveChangesAsync();
 
             return new OperationResult(ResultType.Success);
         }
 
         public async Task<OperationResult> Delete(int id)
         {
-            Country country = await _database.Countries.GetAsync(id);
+            Country country = await Database.Countries.GetAsync(id);
 
             if (country == null || country.Id != id)
             {
                 return new OperationResult(ResultType.Warning, "Country doesn't exists");
             }
 
-            _database.Countries.Delete(country);
-            await _database.SaveChangesAsync();
+            Database.Countries.Delete(country);
+            await Database.SaveChangesAsync();
 
-            bool countryExists = await _database.Countries
+            bool countryExists = await Database.Countries
                 .Select(c => c.Id).ContainsAsync(id);
 
             return countryExists
@@ -119,36 +114,10 @@ namespace Market.BLL.Services
 
         public async Task<bool> CountryNotExists(string name)
         {
-            bool countryNotExists = !await _database.Countries
+            bool countryNotExists = !await Database.Countries
                 .Select(c => c.Name).ContainsAsync(name);
 
             return countryNotExists;
         }
-
-        #region IDisposable Support
-
-        private bool _disposedValue;
-
-        private void Dispose(bool disposing)
-        {
-            if (_disposedValue)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                _database.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        #endregion
     }
 }

@@ -40,12 +40,12 @@ namespace Market.Models.AdminViewModels
         /// <summary>
         /// Роли сотрудника.
         /// </summary>
-        public SortedSet<string> Roles { get; set; }
+        public HashSet<string> Roles { get; set; }
 
         /// <summary>
         /// Доступные роли.
         /// </summary>
-        public SortedSet<string> AvailableRoles { get; set; }
+        public HashSet<string> AvailableRoles { get; set; }
 
         private const string StringLengthError =
             "The {0} must be at least {2} and at max {1} characters long.";

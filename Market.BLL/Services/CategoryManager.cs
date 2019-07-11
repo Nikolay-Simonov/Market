@@ -11,20 +11,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Market.BLL.Services
 {
-    public class CategoryManager : ICategoryManager
+    internal class CategoryManager: AppManagerBase, ICategoryManager
     {
-        private readonly IUnitOfWork _database;
-
-        public CategoryManager(IUnitOfWork database)
-        {
-            _database = database;
-        }
+        public CategoryManager(IUnitOfWork database) : base(database) {}
 
         public async Task<IEnumerable<CategoryDTO>> Categories(string name = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return await _database.Categories.Select(c => new CategoryDTO
+                return await Database.Categories.Select(c => new CategoryDTO
                 {
                     Id = c.Id,
                     Name = c.Name
@@ -32,7 +27,7 @@ namespace Market.BLL.Services
                 }).ToArrayAsync();
             }
 
-            IEnumerable<CategoryDTO> categories = await _database.Categories.Select(c => new CategoryDTO
+            IEnumerable<CategoryDTO> categories = await Database.Categories.Select(c => new CategoryDTO
             {
                 Id = c.Id,
                 Name = c.Name
@@ -44,7 +39,7 @@ namespace Market.BLL.Services
 
         public async Task<CategoryDTO> GetAsync(int id)
         {
-            Category category = await _database.Categories.GetAsync(id);
+            Category category = await Database.Categories.GetAsync(id);
 
             if (category == null || category.Id != id)
             {
@@ -65,11 +60,11 @@ namespace Market.BLL.Services
                 return new OperationResult(ResultType.Error, "Category already exists");
             }
 
-            await _database.Categories.CreateAsync(new Category
+            await Database.Categories.CreateAsync(new Category
             {
                 Name = name
             });
-            await _database.SaveChangesAsync();
+            await Database.SaveChangesAsync();
 
             return new OperationResult(ResultType.Success);
         }
@@ -77,7 +72,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> Edit(CategoryDTO category)
         {
             if (category == null
-                || !await _database.Categories.Select(c => c.Id).ContainsAsync(category.Id))
+                || !await Database.Categories.Select(c => c.Id).ContainsAsync(category.Id))
             {
                 return new OperationResult(ResultType.Error, "Category doesn't exists");
             }
@@ -87,29 +82,29 @@ namespace Market.BLL.Services
                 return new OperationResult(ResultType.Error, "Category already exists");
             }
 
-            _database.Categories.Update(new Category
+            Database.Categories.Update(new Category
             {
                 Id = category.Id,
                 Name = category.Name
             });
-            await _database.SaveChangesAsync();
+            await Database.SaveChangesAsync();
 
             return new OperationResult(ResultType.Success);
         }
 
         public async Task<OperationResult> Delete(int id)
         {
-            Category category = await _database.Categories.GetAsync(id);
+            Category category = await Database.Categories.GetAsync(id);
 
             if (category == null || category.Id != id)
             {
                 return new OperationResult(ResultType.Warning, "Category doesn't exists");
             }
 
-            _database.Categories.Delete(category);
-            await _database.SaveChangesAsync();
+            Database.Categories.Delete(category);
+            await Database.SaveChangesAsync();
 
-            bool categoryExists = await _database.Categories
+            bool categoryExists = await Database.Categories
                 .Select(c => c.Id).ContainsAsync(id);
 
             return categoryExists
@@ -119,36 +114,10 @@ namespace Market.BLL.Services
 
         public async Task<bool> CategoryNotExists(string name)
         {
-            bool categoryNotExists = !await _database.Categories
+            bool categoryNotExists = !await Database.Categories
                 .Select(c => c.Name).ContainsAsync(name);
 
             return categoryNotExists;
         }
-
-        #region IDisposable Support
-
-        private bool _disposedValue;
-
-        private void Dispose(bool disposing)
-        {
-            if (_disposedValue)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                _database.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        #endregion
     }
 }

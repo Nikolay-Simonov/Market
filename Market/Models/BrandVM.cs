@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Market.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,7 @@ namespace Market.Models
              ErrorMessage = "Brand already exists")]
         [StringLength(120, ErrorMessage = StringLengthError, MinimumLength = 2)]
         [RegularExpression(@"[-A-zА-яёЁ ©]+", ErrorMessage = CyrLatRegexError)]
+        [DisplayName("Brand")]
         public string Name
         {
             get => _name;

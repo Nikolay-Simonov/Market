@@ -2,6 +2,8 @@ using System;
 using System.Reflection;
 using Market.DAL.EF;
 using Market.DAL.Entities;
+using Market.DAL.Infrastructure;
+using Market.DAL.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +61,22 @@ namespace Market.DAL.Extensions
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+        }
+
+        /// <summary>
+        /// Внедряет строитель SQL команд.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">Параметр <paramref name="services"/>
+        /// ссылается на null.</exception>
+        public static void AddFacetsSearch(this IServiceCollection services)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddSingleton(typeof(IEntityDescription<>), typeof(EFEntityDescription<>));
+            services.AddTransient(typeof(IFacetsBuilder<>), typeof(FacetsBuilder<>));
         }
     }
 }

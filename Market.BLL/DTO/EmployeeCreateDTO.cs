@@ -14,6 +14,6 @@ namespace Market.BLL.DTO
 
         public string Email { get; set; }
 
-        public SortedSet<string> Roles { get; set; }
+        public HashSet<string> Roles { get; set; }
     }
 }

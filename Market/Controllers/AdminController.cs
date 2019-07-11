@@ -64,7 +64,7 @@ namespace Market.Controllers
         {
             var viewModel = new EmployeeCreateVM
             {
-                AvailableRoles = new SortedSet<string>(await _staffManager.StaffRoles())
+                AvailableRoles = new HashSet<string>(await _staffManager.StaffRoles())
             };
 
             return View(viewModel);
@@ -73,7 +73,7 @@ namespace Market.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateEmployee(EmployeeCreateVM model)
         {
-            model.AvailableRoles = new SortedSet<string>(await _staffManager.StaffRoles());
+            model.AvailableRoles = new HashSet<string>(await _staffManager.StaffRoles());
 
             if (!ModelState.IsValid)
             {
@@ -118,8 +118,8 @@ namespace Market.Controllers
                 MiddleName = user.MiddleName,
                 LastName = user.LastName,
                 Email = user.Email,
-                Roles = new SortedSet<string>(user.ApplicationRoles.Select(r => r.Name)),
-                AvailableRoles = new SortedSet<string>(await _staffManager.StaffRoles())
+                Roles = new HashSet<string>(user.ApplicationRoles.Select(r => r.Name)),
+                AvailableRoles = new HashSet<string>(await _staffManager.StaffRoles())
             };
 
             return View(viewModel);
@@ -128,7 +128,7 @@ namespace Market.Controllers
         [HttpPost]
         public async Task<ActionResult> EditEmployee(EmployeeCreateVM editModel)
         {
-            editModel.AvailableRoles = new SortedSet<string>(await _staffManager.StaffRoles());
+            editModel.AvailableRoles = new HashSet<string>(await _staffManager.StaffRoles());
 
             if (!ModelState.IsValid)
             {

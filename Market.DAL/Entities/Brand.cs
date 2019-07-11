@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Market.DAL.Entities
@@ -14,6 +15,8 @@ namespace Market.DAL.Entities
             get => _name;
             set => _name = value?.Trim();
         }
+
+        public virtual ICollection<Product> Products { get; set; }
 
         private string _name;
     }
