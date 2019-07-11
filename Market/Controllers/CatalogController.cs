@@ -38,7 +38,7 @@ namespace Market.Controllers
                 Brand = productDto.Brand == null ? null : new BrandVM
                 {
                     Id = productDto.Brand.Id,
-                    Name = productDto.Name
+                    Name = productDto.Brand.Name
                 },
                 Category = productDto.Category == null ? null : new CategoryVM
                 {
