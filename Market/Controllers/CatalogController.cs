@@ -87,9 +87,9 @@ namespace Market.Controllers
                     Category = catalogVm.Category,
                     SortField = catalogVm.SortField,
                     SortingDirection = catalogVm.SortingDirection,
-                    EndPrices = catalogVm.EndPrice,
+                    EndPrice = catalogVm.EndPrice,
                     EndWeight = catalogVm.EndWeight,
-                    StartPrices = catalogVm.StartPrice,
+                    StartPrice = catalogVm.StartPrice,
                     StartWeight = catalogVm.StartWeight,
                     PageSize = PageSize,
                     Page = page
@@ -123,6 +123,11 @@ namespace Market.Controllers
             })
             .ToHashSet();
 
+            catalogVm.MaxPrice = criteriesDto.MaxPrice;
+            catalogVm.MaxWeight = criteriesDto.MaxWeight;
+            catalogVm.MinPrice = criteriesDto.MinPrice;
+            catalogVm.MinWeight = criteriesDto.MinWeight;
+
             catalogVm.Products = productsListDto.Products.Select(p => new ProductShortVM
             {
                 Id = p.Id,
@@ -140,11 +145,6 @@ namespace Market.Controllers
                 TotalItems = productsListDto.PagingInfo.TotalItems,
                 ItemsPerPage = productsListDto.PagingInfo.ItemsPerPage
             };
-
-            catalogVm.MaxPrice = productsListDto.Products.Any() ? productsListDto.Products.Max(p => p.Price) : 0;
-            catalogVm.MaxWeight = productsListDto.Products.Any() ? productsListDto.Products.Max(p => p.Weight) : 0;
-            catalogVm.MinPrice = productsListDto.Products.Any() ? productsListDto.Products.Min(p => p.Price) : 0;
-            catalogVm.MinWeight = productsListDto.Products.Any() ? productsListDto.Products.Min(p => p.Weight) : 0;
 
             return View(catalogVm);
         }

@@ -34,15 +34,38 @@ namespace Market.BLL.Services
                 products = products.Where(p => p.Category.Name == categoryName);
             }
 
-            var brandsAndContries = await products
-                .Select(p => new { BrandName = p.Brand.Name, CountryName = p.Country.Name })
-                .ToArrayAsync();
+            var criteries = await products
+            .Select(p => new
+            {
+                BrandName = p.Brand.Name,
+                CountryName = p.Country.Name,
+                p.Price,
+                p.Weight
+            })
+            .ToArrayAsync();
+
+            decimal maxPrice = 0;
+            decimal minPrice = 0;
+            double maxWeight = 0;
+            double minWeight = 0;
+
+            if (criteries.Any())
+            {
+                maxPrice = criteries.Select(c => c.Price).Max();
+                minPrice = criteries.Select(c => c.Price).Min();
+                maxWeight = criteries.Select(c => c.Weight).Max();
+                minWeight = criteries.Select(c => c.Weight).Min();
+            }
 
             return new CatalogFacetsCriteriesDTO
             {
-                Brands = new HashSet<string>(brandsAndContries.Select(bc => bc.BrandName)),
-                Countries = new HashSet<string>(brandsAndContries.Select(bc => bc.CountryName)),
-                Characteristics = await Characteristics(categoryName)
+                Brands = new HashSet<string>(criteries.Select(c => c.BrandName)),
+                Countries = new HashSet<string>(criteries.Select(c => c.CountryName)),
+                Characteristics = await Characteristics(categoryName),
+                MaxPrice = maxPrice,
+                MaxWeight = maxWeight,
+                MinPrice = minPrice,
+                MinWeight = minWeight
             };
         }
 
@@ -149,8 +172,8 @@ namespace Market.BLL.Services
 
             _facetsBuilder.Condition(p => p.Removed, false)
                 .And(p => p.Category.Name, filters.Category)
-                .And(p => p.Price, filters.StartPrices, Op.GreaterEqual)
-                .And(p => p.Price, filters.EndPrices, Op.LessEqual)
+                .And(p => p.Price, filters.StartPrice, Op.GreaterEqual)
+                .And(p => p.Price, filters.EndPrice, Op.LessEqual)
                 .And(p => p.Weight, filters.StartWeight, Op.GreaterEqual)
                 .And(p => p.Weight, filters.EndWeight, Op.LessEqual)
                 .AndIn(p => p.Brand.Name, filters.Brands)

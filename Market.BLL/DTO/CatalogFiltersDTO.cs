@@ -5,9 +5,9 @@ namespace Market.BLL.DTO
 {
     public class CatalogFiltersDTO
     {
-        public decimal? StartPrices { get; set; }
+        public decimal? StartPrice { get; set; }
 
-        public decimal? EndPrices { get; set; }
+        public decimal? EndPrice { get; set; }
 
         public double? StartWeight { get; set; }
 
