@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Market.BLL.Services
 {
-    public class PasswordGenerator : IPasswordGenerator
+    internal class PasswordGenerator : IPasswordGenerator
     {
         private readonly Random _rand = new Random(Environment.TickCount);
         private readonly PasswordOptions _passwordOptions;
@@ -29,7 +29,7 @@ namespace Market.BLL.Services
         /// <summary>
         /// Генерирует случайный пароль.
         /// </summary>
-        public string Next()
+        public string GetNext()
         {
             Span<char> chars = stackalloc char[_passwordOptions.RequiredLength];
             int defaultCount = 0;

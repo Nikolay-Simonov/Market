@@ -2,6 +2,6 @@
 {
     public interface IPasswordGenerator
     {
-        string Next();
+        string GetNext();
     }
 }

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Market.BLL.Services
 {
-    public class StaffManager : IStaffManager
+    internal class StaffManager : IStaffManager
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
@@ -206,7 +206,7 @@ namespace Market.BLL.Services
                 staffRoles.Contains(r, StringComparer.OrdinalIgnoreCase)
             ).ToList();
 
-            string randomPwd = _pwdGenerator.Next();
+            string randomPwd = _pwdGenerator.GetNext();
             IdentityResult result = await _userManager.CreateAsync(user, randomPwd);
 
             if (!result.Succeeded)
@@ -395,7 +395,7 @@ namespace Market.BLL.Services
                         };
                     }
 
-                    password = _pwdGenerator.Next();
+                    password = _pwdGenerator.GetNext();
                 }
 
                 tokenResult = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -410,7 +410,7 @@ namespace Market.BLL.Services
             // то просто генерируем новый.
             if (!userHasPwd)
             {
-                password = _pwdGenerator.Next();
+                password = _pwdGenerator.GetNext();
                 IdentityResult addPwdResult = await _userManager
                     .AddPasswordAsync(user, password);
                 await SendPassword(addPwdResult, user.Email, password);
@@ -422,7 +422,7 @@ namespace Market.BLL.Services
             // ли это пароль и генериуем новый, если это так.
             do
             {
-                password = _pwdGenerator.Next();
+                password = _pwdGenerator.GetNext();
             } while (await _userManager.CheckPasswordAsync(user, password));
 
             tokenResult = await _userManager.GeneratePasswordResetTokenAsync(user);

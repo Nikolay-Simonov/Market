@@ -14,7 +14,7 @@ namespace Market.BLL.Services
 
         #region IDisposable Support
 
-        protected bool _disposedValue;
+        private bool _disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {

@@ -1,3 +1,5 @@
+using Market.DAL.Enums;
+using Market.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -5,8 +7,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Market.DAL.Enums;
-using Market.DAL.Interfaces;
 
 namespace Market.DAL.Infrastructure
 {
@@ -196,18 +196,18 @@ namespace Market.DAL.Infrastructure
             int lastIndex = EntityDescription.EntityProperties.Count - 1;
             int currentIndex = 0;
 
-            foreach (var entityProperty in EntityDescription.EntityProperties)
+            foreach (var (_, value) in EntityDescription.EntityProperties)
             {
                 if (currentIndex < lastIndex)
                 {
-                    selectBuilder.Append(entityProperty.Value);
+                    selectBuilder.Append(value);
                     selectBuilder.Append(", ");
                     currentIndex++;
 
                     continue;
                 }
 
-                selectBuilder.Append(entityProperty.Value);
+                selectBuilder.Append(value);
             }
 
             selectBuilder.Append(" FROM ");
@@ -228,11 +228,13 @@ namespace Market.DAL.Infrastructure
                 }
             }
 
-            if (!StringBuilderIsNullOrWhiteSpace(_queryBuilder))
+            if (StringBuilderIsNullOrWhiteSpace(_queryBuilder))
             {
-                selectBuilder.Append("WHERE ");
-                selectBuilder.Append(_queryBuilder);
+                return selectBuilder.ToString();
             }
+
+            selectBuilder.Append("WHERE ");
+            selectBuilder.Append(_queryBuilder);
 
             return selectBuilder.ToString();
         }

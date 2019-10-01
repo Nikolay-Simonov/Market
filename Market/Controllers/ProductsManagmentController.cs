@@ -34,7 +34,10 @@ namespace Market.Controllers
             productsList ??= new ProductsListVM();
             productsList.Filters ??= new ProductsFiltersVM();
 
-            var productsTask = _productManager.Products(new ProductsFiltersDTO
+            var brands = await _productManager.Brands();
+            var categories = await _productManager.Categories();
+            var countries = await _productManager.Countries();
+            var productsListDTO = await _productManager.Products(new ProductsFiltersDTO
             {
                 Brand = productsList.Filters.Brand,
                 Category = productsList.Filters.Category,
@@ -46,16 +49,11 @@ namespace Market.Controllers
                 PageSize = PageSize,
                 Page = page
             });
-            var brandTask = _productManager.Brands();
-            var categorTask = _productManager.Categories();
-            var countryTask = _productManager.Countries();
 
-            await Task.WhenAll(productsTask, brandTask, categorTask, countryTask);
+            productsList.Brands = new SelectList(brands.Select(b => b.Name));
+            productsList.Categories = new SelectList(categories.Select(c => c.Name));
+            productsList.Countries = new SelectList(countries.Select(c => c.Name));
 
-            var productsListDTO = await productsTask;
-            productsList.Brands = new SelectList((await brandTask).Select(b => b.Name));
-            productsList.Categories = new SelectList((await categorTask).Select(c => c.Name));
-            productsList.Countries = new SelectList((await countryTask).Select(c => c.Name));
             productsList.Products = productsListDTO.Products.Select(p => new ProductDataVM
             {
                 Id = p.Id,

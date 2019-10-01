@@ -3,14 +3,15 @@ using System.Threading.Tasks;
 using Market.DAL.EF;
 using Market.DAL.Entities;
 using Market.DAL.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Market.DAL.Repositories
 {
-    public class EFUnitOfWork : IUnitOfWork
+    internal class EFUnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public EFUnitOfWork(ApplicationDbContext dbContext, IContentEnvironment contentEnvironment)
+        public EFUnitOfWork(ApplicationDbContext dbContext, IServiceProvider serProv)
         {
             _dbContext = dbContext;
 
@@ -24,8 +25,12 @@ namespace Market.DAL.Repositories
             Categories = new EfRepository<Category>(_dbContext);
             Countries = new EfRepository<Country>(_dbContext);
             Characteristics = new EfRepository<Characteristic>(_dbContext);
-            ProductsImages = new ImageRepository<Product>(contentEnvironment);
+            ProductsImages = new ImageRepository<Product>
+            (
+                serProv.GetRequiredService<IContentEnvironment>()
+            );
             Catalog = new CatalogRepository(_dbContext);
+            Cart = new CartRepository(dbContext);
         }
 
         public IRepository<Product> Products { get; }
@@ -42,12 +47,15 @@ namespace Market.DAL.Repositories
 
         public ICatalogRepository Catalog { get; }
 
+        public ICartRepository Cart { get; }
+
         public async Task SaveChangesAsync()
         {
             await _dbContext.SaveChangesAsync();
         }
 
         #region IDisposable Support
+
         private bool _disposedValue;
 
         private void Dispose(bool disposing)
@@ -69,6 +77,7 @@ namespace Market.DAL.Repositories
         {
             Dispose(true);
         }
+
         #endregion
     }
 }

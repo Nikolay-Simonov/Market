@@ -4,13 +4,14 @@ using Market.DAL.EF;
 using Market.DAL.Entities;
 using Market.DAL.Infrastructure;
 using Market.DAL.Interfaces;
+using Market.DAL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Market.DAL.Extensions
 {
-    public static class ServiceProviderExtensions
+    public static class ServiceCollectionExtensions
     {
         /// <summary>
         /// Внедряет контекст базы данных приложения.
@@ -36,7 +37,7 @@ namespace Market.DAL.Extensions
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(connectionString,serverOptions =>
+                options.UseSqlServer(connectionString, serverOptions =>
                     serverOptions.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name));
             });
         }
@@ -77,6 +78,16 @@ namespace Market.DAL.Extensions
 
             services.AddSingleton(typeof(IEntityDescription<>), typeof(EFEntityDescription<>));
             services.AddTransient(typeof(IFacetsBuilder<>), typeof(FacetsBuilder<>));
+        }
+
+        public static void AddUnitOfWork(this IServiceCollection services)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddScoped<IUnitOfWork, EFUnitOfWork>();
         }
     }
 }

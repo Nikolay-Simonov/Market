@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Market.Services
 {
-    public class ContentEnvironment : IContentEnvironment
+    internal class ContentEnvironment : IContentEnvironment
     {
         public ContentEnvironment(IWebHostEnvironment webHostEnvironmentEnvironment)
         {

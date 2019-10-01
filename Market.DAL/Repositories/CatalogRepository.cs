@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Market.DAL.EF;
@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Market.DAL.Repositories
 {
-    public class CatalogRepository : ICatalogRepository
+    internal class CatalogRepository : ICatalogRepository
     {
         private readonly ApplicationDbContext _dbContext;
 
@@ -39,24 +39,26 @@ namespace Market.DAL.Repositories
 
             await select.Connection.OpenAsync();
 
-            if (!string.IsNullOrWhiteSpace(categoryName))
+            if (string.IsNullOrWhiteSpace(categoryName))
             {
-                select.CommandText += " LEFT JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] "
-                                      + "WHERE [Categories].[Name] = @CategoryName";
-                var category = new SqlParameter("CategoryName", SqlDbType.NVarChar)
-                {
-                    Value = categoryName,
-                    Size = Category.NameLength
-                };
-                select.Parameters.Add(category);
-                await select.PrepareAsync();
+                return await select.ExecuteScalarAsync() as string;
             }
+
+            select.CommandText += " LEFT JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] "
+                                  + "WHERE [Categories].[Name] = @CategoryName";
+            DbParameter category = new SqlParameter("CategoryName", SqlDbType.NVarChar)
+            {
+                Value = categoryName,
+                Size = Category.NameLength
+            };
+            select.Parameters.Add(category);
+            await select.PrepareAsync();
 
             return await select.ExecuteScalarAsync() as string;
         }
 
         /// <summary>
-        /// Асинхронно возвращает выборку продуктов, используя SQL.
+        /// Возвращает выборку продуктов, используя билдер фасетного поиска.
         /// </summary>
         /// <param name="facetsBuilder">Строитель запроса фасетного поиска.</param>
         /// <returns>Перечисление продуктов.</returns>

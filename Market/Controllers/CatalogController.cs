@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Market.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class CatalogController : Controller
     {
         private readonly ICatalogManager _catalogManager;

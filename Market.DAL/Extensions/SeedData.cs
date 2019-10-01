@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Market.DAL.Entities;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,16 +15,16 @@ namespace Market.DAL.Extensions
         /// <summary>
         /// Создает записи об администраторе и ролях если их не существует.
         /// </summary>
-        /// <param name="app"></param>
-        /// <exception cref="ArgumentNullException">The argument "<paramref name="app"/>" was null.</exception>
-        public static async void EnsureAdmin(this IApplicationBuilder app)
+        /// <param name="serviceProvider">Провайдер сервисов.</param>
+        /// <exception cref="ArgumentNullException">The argument "<paramref name="serviceProvider"/>" was null.</exception>
+        public static async Task EnsureAdmin(IServiceProvider serviceProvider)
         {
-            if (app == null)
+            if (serviceProvider == null)
             {
-                throw new ArgumentNullException(nameof(app));
+                throw new ArgumentNullException(nameof(serviceProvider));
             }
 
-            using var serviceScope = app.ApplicationServices
+            using var serviceScope = serviceProvider
                 .GetRequiredService<IServiceScopeFactory>()
                 .CreateScope();
 

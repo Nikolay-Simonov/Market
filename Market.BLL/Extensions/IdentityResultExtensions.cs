@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using System;
 using System.Linq;
 using System.Text;
 
@@ -10,6 +11,11 @@ namespace Market.BLL.Extensions
         public static string BuildMessage(this IdentityResult identityResult,
             string fallbackMessage = "An error has occurred.")
         {
+            if (identityResult == null)
+            {
+                throw new ArgumentNullException(nameof(identityResult));
+            }
+
             if (identityResult.Errors == null || !identityResult.Errors.Any())
             {
                 return fallbackMessage;

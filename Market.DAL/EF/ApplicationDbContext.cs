@@ -19,6 +19,7 @@ namespace Market.DAL.EF
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Characteristic> Characteristics { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<CartLine> CartLines { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -55,6 +56,8 @@ namespace Market.DAL.EF
                     .HasForeignKey(ur => ur.UserId)
                     .IsRequired();
             });
+
+            builder.Entity<CartLine>().HasKey(cl => new { cl.UserId, cl.ProductId });
 
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.

@@ -20,6 +20,8 @@ namespace Market.DAL.Interfaces
 
         ICatalogRepository Catalog { get; }
 
+        ICartRepository Cart { get; }
+
         Task SaveChangesAsync();
     }
 }

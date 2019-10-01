@@ -2,22 +2,17 @@
 using Market.BLL.Services;
 using Market.DAL.Entities;
 using Market.DAL.Interfaces;
-using Market.DAL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 namespace Market.BLL.Extensions
 {
-    public static class ServiceProviderExtensions
+    public static class ServiceCollectionExtensions
     {
         public static void AddEmailSender(this IServiceCollection services)
         {
             services.AddTransient<IEmailSender, EmailSender>();
-        }
-
-        public static void AddUnitOfWork(this IServiceCollection services)
-        {
-            services.AddScoped<IUnitOfWork, EFUnitOfWork>();
         }
 
         /// <summary>
@@ -32,6 +27,20 @@ namespace Market.BLL.Extensions
             services.AddScoped<IStaffManager, StaffManager>();
             services.AddScoped<IProductManager, ProductManager>();
             services.AddScoped<ICatalogManager, CatalogManager>();
+            services.AddScoped<ICartManager>(provider =>
+            {
+                var userInfo = provider.GetRequiredService<ICurrentUserInfo>();
+                var database = provider.GetRequiredService<IUnitOfWork>();
+
+                if (userInfo.IsAuthenticated)
+                {
+                    return new CartManager(database, userInfo);
+                }
+
+                var storage = provider.GetRequiredService<ITempStorage<List<ProductLine>>>();
+
+                return new TempCartManager(storage, database);
+            });
         }
 
         public static void AddPasswordGenerator(this IServiceCollection services)

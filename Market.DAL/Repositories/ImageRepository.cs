@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Market.DAL.Enums;
+using Market.DAL.Interfaces;
+using Market.DAL.Results;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Market.DAL.Enums;
-using Market.DAL.Interfaces;
-using Market.DAL.Results;
-using Microsoft.AspNetCore.Http;
 
 namespace Market.DAL.Repositories
 {
@@ -28,8 +28,8 @@ namespace Market.DAL.Repositories
         public override async Task<ImageSaveResult> Save(IFormFile imageFormFile)
         {
             var resultType = ResultType.Error;
-            List<string> messages = new List<string>();
-            string outPath = string.Empty;
+            var messages = new List<string>();
+            var outPath = string.Empty;
 
             try
             {
@@ -55,9 +55,7 @@ namespace Market.DAL.Repositories
                 Directory.CreateDirectory(outputDirectory);
 
                 await using (var fileStream = new FileStream(writePath, FileMode.Create))
-                {
-                    await imageFormFile.CopyToAsync(fileStream);
-                }
+                await imageFormFile.CopyToAsync(fileStream);
 
                 resultType = ResultType.Success;
                 outPath = outputPath;

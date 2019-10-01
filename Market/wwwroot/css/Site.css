@@ -43,7 +43,21 @@
     border-color: #002071;
 }
 
+.product-img {
+    max-height: 156px;
+    max-width: 120px;
+}
+
+.product-item {
+    margin-top: 10px;
+    padding: 10px;
+    border: thin solid #0d46a0;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
-    background-color: #FFF3E0;
+    background-color: #e3f2fd;
 }
