@@ -38,6 +38,7 @@ namespace Market
 
             services.AddDistributedMemoryCache();
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(24));
+            services.AddCors(Configuration);
 
             #region DAL Services
 
@@ -60,6 +61,7 @@ namespace Market
             #endregion
 
             services.AddControllersWithViews().AddJson();
+            services.AddSwagger();
             // Тосты практически не работают (работают через раз) в третьей версии из-за бага
             // Http.DefaultHttpContext.get_Items()
             // .AddRazorRuntimeCompilation(); // в Core 3.0 необходима для работы NToastNotify
@@ -82,9 +84,9 @@ namespace Market
             {
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
+                app.UseHttpsRedirection();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
@@ -93,6 +95,7 @@ namespace Market
             app.UseSession();
             //app.UseNToastNotify();
             app.ChangeCurrentLocale();
+            app.UseCors();
 
             app.UseEndpoints(routes =>
             {
@@ -100,6 +103,12 @@ namespace Market
                     name: "default",
                     pattern: "{controller}/{action}/{id?}",
                     new { Controller = "Home", Action = "Index"});
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Market API V1");
             });
         }
     }

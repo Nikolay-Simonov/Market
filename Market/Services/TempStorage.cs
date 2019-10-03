@@ -15,7 +15,7 @@ namespace Market.Services
         public TempStorage(IHttpContextAccessor httpContextAccessor)
         {
             _session = httpContextAccessor.HttpContext.Session;
-            Key = string.Intern(typeof(TEntity).Name + Salt);
+            Key = string.Intern(typeof(TEntity).FullName + Salt);
         }
 
         public Task Set(TEntity value) => Task.Run(() => _session.Set(Key, value));

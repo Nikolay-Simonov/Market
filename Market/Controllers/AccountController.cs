@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 namespace Market.Controllers
 {
     [Authorize]
-    [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

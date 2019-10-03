@@ -27,7 +27,7 @@ namespace Market.BLL.Services
                 quantity = 1;
             }
 
-            var lines = await _storage.Get();
+            var lines = await _storage.Get() ?? new List<ProductLine>();
 
             if (!await Database.Products.AnyAsync(p => p.Id == id))
             {
@@ -70,7 +70,7 @@ namespace Market.BLL.Services
         public async Task<ProductLineDTO> ProductLine(int id)
         {
             var lines = await _storage.Get();
-            var line = lines.Find(l => l.ProductId == id);
+            var line = lines?.Find(l => l.ProductId == id);
 
             return line == null || line.Product == null ? null : new ProductLineDTO
             {
@@ -87,18 +87,19 @@ namespace Market.BLL.Services
 
         public async Task<List<ProductLineDTO>> ProductsLines()
         {
-            return (await _storage.Get()).Where(l => l != null && l.Product != null)
-                .Select(line => new ProductLineDTO
-                {
-                    Id = line.ProductId,
-                    Brand = line.Product.Brand?.Name,
-                    Country = line.Product.Country.Name,
-                    Name = line.Product.Name,
-                    Image = line.Product.Image,
-                    Price = line.Product.Price,
-                    Quantity = line.Quantity,
-                    Weight = line.Product.Weight
-                }).ToList();
+            var lines = await _storage.Get();
+
+            return lines == null ? new List<ProductLineDTO>() : lines.Select(line => new ProductLineDTO
+            {
+                Id = line.ProductId,
+                Brand = line.Product.Brand?.Name,
+                Country = line.Product.Country.Name,
+                Name = line.Product.Name,
+                Image = line.Product.Image,
+                Price = line.Product.Price,
+                Quantity = line.Quantity,
+                Weight = line.Product.Weight
+            }).ToList();
         }
 
         public async Task<OperationResult> Remove(int id, int quantity = 1)
@@ -109,6 +110,11 @@ namespace Market.BLL.Services
             }
 
             var lines = await _storage.Get();
+
+            if (lines == null)
+            {
+                return new OperationResult(ResultType.Info, "Cart is empty");
+            }
 
             if (!await Database.Products.AnyAsync(p => p.Id == id))
             {
@@ -122,7 +128,7 @@ namespace Market.BLL.Services
 
             if (productLine == null)
             {
-                return new OperationResult(ResultType.Success);
+                return new OperationResult(ResultType.Warning, "Product not found in cart");
             }
 
             int total = productLine.Quantity - quantity;
@@ -144,7 +150,7 @@ namespace Market.BLL.Services
         public async Task<OperationResult> RemoveLine(int id)
         {
             var lines = await _storage.Get();
-            lines.RemoveAll(l => l.ProductId == id);
+            lines?.RemoveAll(l => l.ProductId == id);
             await _storage.Set(lines);
 
             return new OperationResult(ResultType.Success);

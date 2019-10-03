@@ -70,6 +70,9 @@ namespace Market.Controllers.Api
         /// <summary>
         /// Add or remove the specified quantity of product in cart
         /// </summary>
+        /// <response code="400">Cart is empty</response>
+        /// <response code="404">Product not found <br/> User not found <br/> Product not found in cart</response>
+        /// <response code="500">Failed to remove product from cart. <br/> Failed to add product</response>
         [HttpPost]
         public async Task<ActionResult> Post(int id, int quantity, string operation)
         {
@@ -101,6 +104,7 @@ namespace Market.Controllers.Api
         /// <summary>
         /// Remove product line from cart
         /// </summary>
+        /// <response code="404">User not found</response>
         [HttpDelete("id")]
         public async Task<ActionResult> Delete(int id)
         {
@@ -119,6 +123,7 @@ namespace Market.Controllers.Api
         /// <summary>
         /// Clear cart
         /// </summary>\
+        /// <response code="404">User not found</response>
         [HttpDelete]
         public async Task<ActionResult> Delete()
         {

@@ -4,7 +4,6 @@ using Market.DAL.Entities;
 using Market.DAL.Enums;
 using Market.DAL.Interfaces;
 using Market.DAL.Results;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -148,7 +147,7 @@ namespace Market.BLL.Services
 
             if (productLine == null)
             {
-                return new OperationResult(ResultType.Warning, "Product not found");
+                return new OperationResult(ResultType.Warning, "Product not found in cart");
             }
 
             int total = productLine.Quantity - quantity;

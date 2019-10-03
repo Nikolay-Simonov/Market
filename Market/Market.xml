@@ -1,0 +1,197 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Market</name>
+    </assembly>
+    <members>
+        <member name="M:Market.Controllers.Api.CartController.Get(System.Int32)">
+            <summary>
+            Get product line from cart by specified id
+            </summary>
+        </member>
+        <member name="M:Market.Controllers.Api.CartController.Get">
+            <summary>
+            Get all products lines from cart
+            </summary>
+        </member>
+        <member name="M:Market.Controllers.Api.CartController.Post(System.Int32,System.Int32,System.String)">
+            <summary>
+            Add or remove the specified quantity of product in cart
+            </summary>
+            <response code="400">Cart is empty</response>
+            <response code="404">Product not found <br/> User not found <br/> Product not found in cart</response>
+            <response code="500">Failed to remove product from cart. <br/> Failed to add product</response>
+        </member>
+        <member name="M:Market.Controllers.Api.CartController.Delete(System.Int32)">
+            <summary>
+            Remove product line from cart
+            </summary>
+            <response code="404">User not found</response>
+        </member>
+        <member name="M:Market.Controllers.Api.CartController.Delete">
+            <summary>
+            Clear cart
+            </summary>\
+            <response code="404">User not found</response>
+        </member>
+        <member name="M:Market.Infrastructure.DataListTagHelper.#ctor(Microsoft.AspNetCore.Mvc.ViewFeatures.IHtmlGenerator)">
+            <summary>
+            Creates a new <see cref="T:Market.Infrastructure.DataListTagHelper"/>.
+            </summary>
+            <param name="generator">The <see cref="T:Microsoft.AspNetCore.Mvc.ViewFeatures.IHtmlGenerator"/>.</param>
+        </member>
+        <member name="P:Market.Infrastructure.DataListTagHelper.For">
+            <summary>
+            An expression to be evaluated against the current model.
+            </summary>
+        </member>
+        <member name="M:Market.Infrastructure.EnumRadioGroupTagHelper.#ctor(Microsoft.AspNetCore.Mvc.ViewFeatures.IHtmlGenerator)">
+            <summary>
+            Creates a new <see cref="T:Market.Infrastructure.EnumRadioGroupTagHelper"/>.
+            </summary>
+            <param name="generator">The <see cref="T:Microsoft.AspNetCore.Mvc.ViewFeatures.IHtmlGenerator"/>.</param>
+        </member>
+        <member name="P:Market.Infrastructure.EnumRadioGroupTagHelper.RadioGroupEnum">
+            <summary>
+            An expression to be evaluated against the current model.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.EnumRadioGroupTagHelper.InputClass">
+            <summary>
+            Класс радиокнопки.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.EnumRadioGroupTagHelper.ActiveClass">
+            <summary>
+            Класс текущей радиокнопки.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.PageLinkTagHelper.PagingInfo">
+            <summary>
+            Модель пагинации.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.PageLinkTagHelper.MaxPagesLine">
+            <summary>
+            Максимальное количество ссылок на страницы в линию.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.PageLinkTagHelper.PageAction">
+            <summary>
+            Метод действия текущего контроллера на который
+            будут создаваться ссылки.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.PageLinkTagHelper.PageClass">
+            <summary>
+            Класс ссылки на страницу.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.PageLinkTagHelper.PageClassNormal">
+            <summary>
+            Класс ссылки не являющейся текущей страницой.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.PageLinkTagHelper.PageClassSelected">
+            <summary>
+            Класс ссылки текущей страницы.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.PageLinkTagHelper.ButtonText">
+            <summary>
+            Текст на кнопке перехода в форме.
+            </summary>
+        </member>
+        <member name="P:Market.Infrastructure.PageLinkTagHelper.EnableArrows">
+            <summary>
+            Указывает будут ли отображаться стрелки навагиации: вперед/назад.
+            </summary>
+        </member>
+        <member name="M:Market.Infrastructure.PageLinkTagHelper.PageClassesEnabled">
+            <summary>
+            Выясняет применяются ли классы стилей для ссылок на страницы.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Market.Models.AccountViewModels.RegisterViewModel.FirstName">
+            <summary>
+            Имя
+            </summary>
+        </member>
+        <member name="P:Market.Models.AccountViewModels.RegisterViewModel.MiddleName">
+            <summary>
+            Отчество
+            </summary>
+        </member>
+        <member name="P:Market.Models.AccountViewModels.RegisterViewModel.LastName">
+            <summary>
+            Фамилия
+            </summary>
+        </member>
+        <member name="P:Market.Models.AccountViewModels.RegisterViewModel.Address">
+            <summary>
+            Адрес доставки
+            </summary>
+        </member>
+        <member name="P:Market.Models.AdminViewModels.EmployeeCreateVM.FirstName">
+            <summary>
+            Имя.
+            </summary>
+        </member>
+        <member name="P:Market.Models.AdminViewModels.EmployeeCreateVM.MiddleName">
+            <summary>
+            Отчество.
+            </summary>
+        </member>
+        <member name="P:Market.Models.AdminViewModels.EmployeeCreateVM.LastName">
+            <summary>
+            Фамилия.
+            </summary>
+        </member>
+        <member name="P:Market.Models.AdminViewModels.EmployeeCreateVM.Roles">
+            <summary>
+            Роли сотрудника.
+            </summary>
+        </member>
+        <member name="P:Market.Models.AdminViewModels.EmployeeCreateVM.AvailableRoles">
+            <summary>
+            Доступные роли.
+            </summary>
+        </member>
+        <member name="P:Market.Models.ApplicationUserVM.FirstName">
+            <summary>
+            Имя
+            </summary>
+        </member>
+        <member name="P:Market.Models.ApplicationUserVM.MiddleName">
+            <summary>
+            Отчество
+            </summary>
+        </member>
+        <member name="P:Market.Models.ApplicationUserVM.LastName">
+            <summary>
+            Фамилия
+            </summary>
+        </member>
+        <member name="P:Market.Models.ApplicationUserVM.Address">
+            <summary>
+            Адрес доставки
+            </summary>
+        </member>
+        <member name="P:Market.Models.ApplicationUserVM.FullName">
+            <summary>
+            Полное имя
+            </summary>
+        </member>
+        <member name="P:Market.Models.ManageViewModels.IndexViewModel.Address">
+            <summary>
+            Адрес доставки
+            </summary>
+        </member>
+        <member name="P:Market.Models.ProductVM.Weight">
+            <summary>
+            Вес в граммах.
+            </summary>
+        </member>
+    </members>
+</doc>
