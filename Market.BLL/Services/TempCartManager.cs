@@ -1,4 +1,4 @@
-﻿using Market.BLL.DTO;
+using Market.BLL.DTO;
 using Market.BLL.Interfaces;
 using Market.DAL.Entities;
 using Market.DAL.Enums;
@@ -29,7 +29,7 @@ namespace Market.BLL.Services
 
             var lines = await _storage.Get();
 
-            if (await Database.Products.AnyAsync(p => p.Id == id))
+            if (!await Database.Products.AnyAsync(p => p.Id == id))
             {
                 lines.RemoveAll(p => p.ProductId == id);
                 await _storage.Set(lines);
@@ -110,7 +110,7 @@ namespace Market.BLL.Services
 
             var lines = await _storage.Get();
 
-            if (await Database.Products.AnyAsync(p => p.Id == id))
+            if (!await Database.Products.AnyAsync(p => p.Id == id))
             {
                 lines.RemoveAll(p => p.ProductId == id);
                 await _storage.Set(lines);

@@ -148,7 +148,7 @@ namespace Market.BLL.Services
 
             if (productLine == null)
             {
-                return new OperationResult(ResultType.Success);
+                return new OperationResult(ResultType.Warning, "Product not found");
             }
 
             int total = productLine.Quantity - quantity;
