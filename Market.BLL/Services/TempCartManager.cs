@@ -76,7 +76,7 @@ namespace Market.BLL.Services
             {
                 Id = line.ProductId,
                 Brand = line.Product.Brand?.Name,
-                Country = line.Product.Country.Name,
+                Country = line.Product.Country?.Name,
                 Name = line.Product.Name,
                 Image = line.Product.Image,
                 Price = line.Product.Price,
@@ -93,7 +93,7 @@ namespace Market.BLL.Services
             {
                 Id = line.ProductId,
                 Brand = line.Product.Brand?.Name,
-                Country = line.Product.Country.Name,
+                Country = line.Product.Country?.Name,
                 Name = line.Product.Name,
                 Image = line.Product.Image,
                 Price = line.Product.Price,
@@ -150,7 +150,13 @@ namespace Market.BLL.Services
         public async Task<OperationResult> RemoveLine(int id)
         {
             var lines = await _storage.Get();
-            lines?.RemoveAll(l => l.ProductId == id);
+
+            if (lines == null)
+            {
+                return new OperationResult(ResultType.Info, "Cart is empty");
+            }
+
+            lines.RemoveAll(l => l.ProductId == id);
             await _storage.Set(lines);
 
             return new OperationResult(ResultType.Success);

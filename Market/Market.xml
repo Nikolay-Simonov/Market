@@ -8,6 +8,7 @@
             <summary>
             Get product line from cart by specified id
             </summary>
+            <response code="404">Product not found</response>
         </member>
         <member name="M:Market.Controllers.Api.CartController.Get">
             <summary>
@@ -27,6 +28,7 @@
             Remove product line from cart
             </summary>
             <response code="404">User not found</response>
+            <response code="400">Cart is empty</response>
         </member>
         <member name="M:Market.Controllers.Api.CartController.Delete">
             <summary>

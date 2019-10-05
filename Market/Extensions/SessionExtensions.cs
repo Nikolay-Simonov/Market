@@ -13,9 +13,12 @@ namespace Market.Extensions
             //
             // session.Set(key, bytes);
 
-            string stringValue = value == null
-                ? null
-                : JsonConvert.SerializeObject(value);
+            if (value == null)
+            {
+                session.Remove(key);
+            }
+
+            string stringValue = JsonConvert.SerializeObject(value);
 
             session.SetString(key, stringValue);
         }

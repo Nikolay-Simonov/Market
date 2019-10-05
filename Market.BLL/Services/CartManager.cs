@@ -28,7 +28,7 @@ namespace Market.BLL.Services
             {
                 Id = line.ProductId,
                 Brand = line.Product.Brand?.Name,
-                Country = line.Product.Country.Name,
+                Country = line.Product.Country?.Name,
                 Name = line.Product.Name,
                 Image = line.Product.Image,
                 Price = line.Product.Price,
@@ -45,7 +45,7 @@ namespace Market.BLL.Services
                 {
                     Id = line.ProductId,
                     Brand = line.Product.Brand?.Name,
-                    Country = line.Product.Country.Name,
+                    Country = line.Product.Country?.Name,
                     Name = line.Product.Name,
                     Image = line.Product.Image,
                     Price = line.Product.Price,

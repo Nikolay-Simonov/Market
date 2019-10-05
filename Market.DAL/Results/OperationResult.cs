@@ -11,6 +11,7 @@ namespace Market.DAL.Results
         public OperationResult(ResultType resultType, params string[] messages)
         {
             Type = resultType;
+            Messages = messages;
         }
 
         public ResultType Type { get; }

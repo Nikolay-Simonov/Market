@@ -16,6 +16,17 @@ namespace Market.DAL.Repositories
     {
         private readonly ApplicationDbContext _dbContext;
 
+        #region Entity props
+ 
+        private const string PRODUCTS = nameof(ApplicationDbContext.Products);
+        private const string CATEGORIES = nameof(ApplicationDbContext.Categories);
+        private const string P_CATEGORY_ID = nameof(Product.CategoryId);
+        private const string CHARACTER = nameof(Product.Character);
+        private const string CATEGORY_ID = nameof(Category.Id);
+        private const string CATEGORY_NAME = nameof(Category.Name);
+
+        #endregion
+
         public CatalogRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -31,11 +42,11 @@ namespace Market.DAL.Repositories
             await using DbCommand select = _dbContext.Database.GetDbConnection().CreateCommand();
 
             select.CommandText =
-                @"SELECT
+                $@"SELECT
                     '<characteristics>' +
-                        STRING_AGG(CAST([Products].[Character].query('characteristics/characteristic') AS nvarchar(max)), '') +
+                        STRING_AGG(CAST([{PRODUCTS}].[{CHARACTER}].query('characteristics/characteristic') AS nvarchar(max)), '') +
                     '</characteristics>' AS Characteristics
-                FROM [Products]";
+                FROM [{PRODUCTS}]";
 
             await select.Connection.OpenAsync();
 
@@ -44,13 +55,16 @@ namespace Market.DAL.Repositories
                 return await select.ExecuteScalarAsync() as string;
             }
 
-            select.CommandText += " LEFT JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] "
-                                  + "WHERE [Categories].[Name] = @CategoryName";
+            select.CommandText +=
+                $" LEFT JOIN [{CATEGORIES}] ON [{PRODUCTS}].[{P_CATEGORY_ID}] = [{CATEGORIES}].[{CATEGORY_ID}] "
+                + $"WHERE [{CATEGORIES}].[{CATEGORY_NAME}] = @CategoryName";
+
             DbParameter category = new SqlParameter("CategoryName", SqlDbType.NVarChar)
             {
                 Value = categoryName,
                 Size = Category.NameLength
             };
+
             select.Parameters.Add(category);
             await select.PrepareAsync();
 
@@ -136,7 +150,7 @@ namespace Market.DAL.Repositories
 
             #region Local Functions
 
-            bool ContainsOnlyPrefix(string name) => name == "@"
+            static bool ContainsOnlyPrefix(string name) => name == "@"
                 || name.StartsWith("@") && string.IsNullOrWhiteSpace(name.Substring(1));
 
             #endregion

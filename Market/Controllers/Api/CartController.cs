@@ -23,6 +23,7 @@ namespace Market.Controllers.Api
         /// <summary>
         /// Get product line from cart by specified id
         /// </summary>
+        /// <response code="404">Product not found</response>
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductLineVM>> Get(int id)
         {
@@ -105,6 +106,7 @@ namespace Market.Controllers.Api
         /// Remove product line from cart
         /// </summary>
         /// <response code="404">User not found</response>
+        /// <response code="400">Cart is empty</response>
         [HttpDelete("id")]
         public async Task<ActionResult> Delete(int id)
         {

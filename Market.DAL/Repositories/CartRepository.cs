@@ -29,6 +29,10 @@ namespace Market.DAL.Repositories
         }
 
         public async Task<IEnumerable<ProductLine>> ProductsLines(string userId) => await _dbContext.CartLines
+            .Include(cl => cl.Product)
+                .ThenInclude(p => p.Country)
+            .Include(cl => cl.Product)
+                .ThenInclude(p => p.Brand)
             .Where(cl => cl.UserId == userId).Select(cl => new ProductLine
             {
                 ProductId = cl.ProductId,
