@@ -76,11 +76,11 @@ namespace Market.DAL.Repositories
         }
 
         public async Task<ProductLine> ProductLine(int productId, string userId) => await _dbContext.CartLines
-            .Where(cl => cl.ProductId == productId || cl.UserId == userId).Select(cl => new ProductLine
+            .Where(cl => cl.ProductId == productId && cl.UserId == userId).Select(cl => new ProductLine
             {
                 ProductId = cl.ProductId,
                 Product = cl.Product,
                 Quantity = cl.Quantity
-            }).FirstOrDefaultAsync();
+            }).SingleOrDefaultAsync();
     }
 }

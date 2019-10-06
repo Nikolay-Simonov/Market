@@ -25,6 +25,11 @@
     {
       "library": "ion-rangeslider@2.3.0",
       "destination": "wwwroot/lib/ion-rangeslider/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "vue@2.6.10",
+      "destination": "wwwroot/lib/vue/"
     }
   ]
 }

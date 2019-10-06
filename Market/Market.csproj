@@ -33,7 +33,6 @@
 
   <ItemGroup>
     <None Include="bundleconfig.json" />
-    <Folder Include="Views\Cart\" />
     <Folder Include="wwwroot\Images" />
     <ProjectReference Include="..\Market.BLL\Market.BLL.csproj" />
   </ItemGroup>

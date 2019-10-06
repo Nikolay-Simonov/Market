@@ -330,17 +330,15 @@ namespace Market.Controllers
             const string id = "Id";
             const string name = "Name";
 
-            var characterTask = _productManager.Characteristics();
-            var brandTask = _productManager.Brands();
-            var categorTask = _productManager.Categories();
-            var countryTask = _productManager.Countries();
+            var characteristics = await _productManager.Characteristics();
+            var brands = await _productManager.Brands();
+            var categories = await _productManager.Categories();
+            var countries = await _productManager.Countries();
 
-            await Task.WhenAll(characterTask, brandTask, categorTask, countryTask);
-
-            model.AvailableCharacteristics = new SelectList(await characterTask, id, name);
-            model.Brands = new SelectList(await brandTask, id, name);
-            model.Categories = new SelectList(await categorTask, id, name);
-            model.Countries = new SelectList(await countryTask, id, name);
+            model.AvailableCharacteristics = new SelectList(characteristics, id, name);
+            model.Brands = new SelectList(brands, id, name);
+            model.Categories = new SelectList(categories, id, name);
+            model.Countries = new SelectList(countries, id, name);
 
             return model;
         }

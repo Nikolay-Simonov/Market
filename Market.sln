@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.DAL", "Market.DAL\Ma
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.BLL", "Market.BLL\Market.BLL.csproj", "{9609E835-47D6-4886-AB04-9082A0E87A32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NToastNotify", "NToast\NToastNotify.csproj", "{4BF77E66-E454-4290-AA06-17C7DF1FF4B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NToastNotify", "NToast\NToastNotify.csproj", "{4BF77E66-E454-4290-AA06-17C7DF1FF4B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

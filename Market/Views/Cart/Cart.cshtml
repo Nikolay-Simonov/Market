@@ -1,0 +1,243 @@
+﻿@using System.Globalization
+@model string
+
+<style rek="stylesheet">
+    [v-cloak] {
+      display: none;
+    }
+</style>
+
+<div id="app">
+    <cart v-cloak inline-template>
+        <div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-right">
+                        <a v-if="" :href="canContinue" class="btn btn-primary">Continue shopping</a>
+                        <button v-if="lines.length !== 0" class="btn btn-danger" v-on:click="clearCart">Clear cart</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row product-item" v-bind:key="line.id" v-for="(line, index) in lines">
+                <div class="col-md-2">
+                    <a :href="getProductUrl(index)">
+                        <img :src="line.image" style="max-height: 150px"/>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <p><b>Name</b> {{line.name}}</p>
+                    <p><b>Brand</b> {{line.brand}}</p>
+                    <p><b>Country</b> {{line.country}}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><b>Weight</b> {{line.weight}} kg</p>
+                    <p><b>Price</b> {{line.price}} @CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol</p>
+                    <p><b>Total price</b> {{line.totalPrice}} @CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol</p>
+                </div>
+                <div class="col-md-2">
+                    <div class="pull-right">
+                        <p><b>Quantity</b> {{line.quantity}}</p>
+                        <div class="btn-group pull-right">
+                            <button class="btn btn-success" v-on:click="changeLine(index, 'add')">+</button>
+                            <button class="btn btn-primary" v-on:click="changeLine(index, 'remove')">-</button>
+                            <button class="btn btn-danger" v-on:click="deleteFromCart(index)">&times;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </cart>
+</div>
+
+@{ 
+    await Html.RenderPartialAsync("_VuePartial");
+    await Html.RenderPartialAsync("_SweetalertPartial");
+}
+
+<script type="text/javascript">
+    Vue.component("cart", {
+        data: function () {
+            return {
+                lines: [],
+                returnUrl: "@Model",
+                productUrl: "@Url.Action("Product", "Catalog")"
+            }
+        },
+        computed: {
+            canContinue: function () {
+                return this.returnUrl !== null && this.returnUrl !== '' ? true : false;
+            }
+        },
+        methods: {
+            clearCart: async function () {
+                await fetch("/../api/cart", {
+                    mode: "cors",
+                    method: "DELETE",
+                    credentials: "same-origin"
+                });
+                this.lines = [];
+            },
+            changeLine: async function (index, operation) {
+                if (operation !== "add" || operation !== "remove") {
+                    return;
+                }
+
+                if (this.lines[index] === null) {
+                    this.lines.splice(index, 1);
+                    return;
+                }
+
+                let response = await fetch("/../api/cart", {
+                    mode: "cors",
+                    method: "DELETE",
+                    headers: {
+                        "Content-type": "application/json",
+                        'Access-Control-Request-Headers': 'Location'
+                    },
+                    credentials: "same-origin",
+                    body: JSON.stringify({ id: this.lines[index].id })
+                });
+
+                if (response.ok) {
+                    this.lines.splice(index, 1);
+                    return;
+                }
+
+                if (response.status === 400) {
+                    await clearCart();
+                    swal({
+                        title: "Warning",
+                        text: await response.text(),
+                        type: "warning"
+                    });
+                    return;
+                }
+
+                if (response.status === 500) {
+                    let text = command === "add"
+                        ? "Failed to add product in cart"
+                        : "Failed remove product from cart";
+                    swal({
+                        title: "Error",
+                        text: text,
+                        type: "error"
+                    });
+                    return;
+                }
+
+                if (response.status === 404) {
+                    let text = await response.text();
+
+                    if (text === "Product not found" || text === "Product not found in cart") {
+                        this.lines.splice(index, 1);
+                        swal({
+                            title: "Warning",
+                            text: text,
+                            type: "warning"
+                        });
+                        return;
+                    }
+
+                    await clearCart();
+                    swal({
+                        title: "Error",
+                        text: text,
+                        type: "error"
+                    });
+                    return;
+                }
+
+                if (!response.ok) {
+                    await clearCart();
+                    swal({
+                        title: "Error",
+                        text: "An error occurred",
+                        type: "error"
+                    });
+                    return;
+                }
+
+                let location = response.headers.get("location");
+                let id = (await response.json()).id;
+                let result = await fetch(location, {
+                    mode: "cors",
+                    method: "GET",
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    credentials: "same-origin",
+                    body: JSON.stringify({ id })
+                });
+
+                if (result.status === 404) {
+                    this.lines.splice(index, 1);
+                    swal({
+                        title: "Warning",
+                        text: await result.text(),
+                        type: "watning"
+                    });
+                    return;
+                }
+
+                if (!result.ok) {
+                    await clearCart();
+                    swal({
+                        title: "Error",
+                        text: "An error occurred",
+                        type: "error"
+                    });
+                    return;
+                }
+
+                let line = await result.json();
+                this.lines.$set(index, line);
+            },
+            removeFromCart: async function (index) {
+                if (this.lines[index] === null) {
+                    this.lines.splice(index, 1);
+                    return;
+                }
+
+                let response = await fetch("/../api/cart", {
+                    method: "POST",
+                    mode: "cors",
+                    headers: { "Content-type": "application/json" },
+                    credentials: "same-origin",
+                    body: JSON.stringify({
+                        id: this.lines[index].id,
+                        quantity: 1,
+                        command: "remove"
+                    })
+                });
+
+                if (!response.ok) {
+                    await clearCart();
+                    let text = await response.text();
+                    swal({
+                        title: "Error",
+                        text: text,
+                        type: "error"
+                    });
+                }
+            },
+            getProductUrl: function (index) {
+                if (this.lines[index] === null) {
+                    this.lines.splice(index, 1);
+                    return;
+                }
+
+                return this.productUrl + "/" + this.lines[index].id;
+            }
+        },
+        created: async function () {
+            let response = await fetch("/../api/cart", {
+                mode: "cors",
+                method: "GET",
+                credentials: "same-origin"
+            });
+            this.lines = await response.json();
+        }
+    });
+
+    var app = new Vue({ el: "#app" });
+</script>
