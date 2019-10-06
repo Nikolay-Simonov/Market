@@ -7,14 +7,15 @@
     }
 </style>
 
-<div id="app">
+<div id="cart" style="padding-top: 10px">
     <cart v-cloak inline-template>
         <div>
             <div class="row">
                 <div class="col-md-12">
+                    <p v-if="lines.length < 1 && uploaded"><big><b>Your cart is empty :(</b></big></p>
                     <div class="btn-group pull-right">
-                        <a v-if="" :href="canContinue" class="btn btn-primary">Continue shopping</a>
-                        <button v-if="lines.length !== 0" class="btn btn-danger" v-on:click="clearCart">Clear cart</button>
+                        <a v-if="canContinue" :href="returnUrl" class="btn btn-primary">Continue shopping</a>
+                        <button v-if="lines.length > 0" class="btn btn-danger" v-on:click="clearCart">Clear cart</button>
                     </div>
                 </div>
             </div>
@@ -40,7 +41,7 @@
                         <div class="btn-group pull-right">
                             <button class="btn btn-success" v-on:click="changeLine(index, 'add')">+</button>
                             <button class="btn btn-primary" v-on:click="changeLine(index, 'remove')">-</button>
-                            <button class="btn btn-danger" v-on:click="deleteFromCart(index)">&times;</button>
+                            <button class="btn btn-danger" v-on:click="removeFromCart(index)">&times;</button>
                         </div>
                     </div>
                 </div>
@@ -60,7 +61,8 @@
             return {
                 lines: [],
                 returnUrl: "@Model",
-                productUrl: "@Url.Action("Product", "Catalog")"
+                productUrl: "@Url.Action("Product", "Catalog")",
+                uploaded: false
             }
         },
         computed: {
@@ -78,7 +80,7 @@
                 this.lines = [];
             },
             changeLine: async function (index, operation) {
-                if (operation !== "add" || operation !== "remove") {
+                if (operation !== "add" && operation !== "remove") {
                     return;
                 }
 
@@ -89,32 +91,38 @@
 
                 let response = await fetch("/../api/cart", {
                     mode: "cors",
-                    method: "DELETE",
+                    method: "POST",
                     headers: {
                         "Content-type": "application/json",
                         'Access-Control-Request-Headers': 'Location'
                     },
                     credentials: "same-origin",
-                    body: JSON.stringify({ id: this.lines[index].id })
+                    body: JSON.stringify({
+                        id: this.lines[index].id,
+                        quantity: 1,
+                        operation: operation
+                    })
                 });
 
-                if (response.ok) {
-                    this.lines.splice(index, 1);
-                    return;
-                }
-
                 if (response.status === 400) {
+                    let text = await response.text();
+
+                    if (text !== "Cart is empty") {
+                        return;
+                    }
+
                     await clearCart();
                     swal({
                         title: "Warning",
-                        text: await response.text(),
+                        text: text,
                         type: "warning"
                     });
                     return;
                 }
 
                 if (response.status === 500) {
-                    let text = command === "add"
+                    this.lines.splice(index, 1);
+                    let text = operation === "add"
                         ? "Failed to add product in cart"
                         : "Failed remove product from cart";
                     swal({
@@ -159,14 +167,10 @@
 
                 let location = response.headers.get("location");
                 let id = (await response.json()).id;
-                let result = await fetch(location, {
+                let result = await fetch(`${location}/${id}`, {
                     mode: "cors",
                     method: "GET",
-                    headers: {
-                        "Content-type": "application/json"
-                    },
-                    credentials: "same-origin",
-                    body: JSON.stringify({ id })
+                    credentials: "same-origin"
                 });
 
                 if (result.status === 404) {
@@ -190,7 +194,7 @@
                 }
 
                 let line = await result.json();
-                this.lines.$set(index, line);
+                this.$set(this.lines, index, line);
             },
             removeFromCart: async function (index) {
                 if (this.lines[index] === null) {
@@ -198,16 +202,11 @@
                     return;
                 }
 
-                let response = await fetch("/../api/cart", {
-                    method: "POST",
+                let id = this.lines[index].id;
+                let response = await fetch(`/../api/cart/${id}`, {
+                    method: "DELETE",
                     mode: "cors",
-                    headers: { "Content-type": "application/json" },
-                    credentials: "same-origin",
-                    body: JSON.stringify({
-                        id: this.lines[index].id,
-                        quantity: 1,
-                        command: "remove"
-                    })
+                    credentials: "same-origin"
                 });
 
                 if (!response.ok) {
@@ -219,6 +218,8 @@
                         type: "error"
                     });
                 }
+
+                this.lines.splice(index, 1);
             },
             getProductUrl: function (index) {
                 if (this.lines[index] === null) {
@@ -236,8 +237,9 @@
                 credentials: "same-origin"
             });
             this.lines = await response.json();
+            this.uploaded = true;
         }
     });
 
-    var app = new Vue({ el: "#app" });
+    var cart = new Vue({ el: "#cart" });
 </script>

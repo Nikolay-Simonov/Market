@@ -15,7 +15,7 @@
             Get all products lines from cart
             </summary>
         </member>
-        <member name="M:Market.Controllers.Api.CartController.Post(System.Int32,System.Int32,System.String)">
+        <member name="M:Market.Controllers.Api.CartController.Post(Market.Models.Cart.ChangeLineVM)">
             <summary>
             Add or remove the specified quantity of product in cart
             </summary>

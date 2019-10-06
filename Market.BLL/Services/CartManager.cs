@@ -71,7 +71,7 @@ namespace Market.BLL.Services
                 return new OperationResult(ResultType.Warning, "User not found");
             }
 
-            if (!await Database.Products.AnyAsync(p => p.Id == id))
+            if (!await Database.Products.AnyAsync(p => p.Id == id && !p.Removed))
             {
                 await Database.Cart.Remove(id, userId);
                 await Database.SaveChangesAsync();

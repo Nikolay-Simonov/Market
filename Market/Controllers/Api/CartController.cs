@@ -1,6 +1,7 @@
 ﻿using Market.BLL.Interfaces;
 using Market.DAL.Enums;
 using Market.Models;
+using Market.Models.Cart;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -74,18 +75,23 @@ namespace Market.Controllers.Api
         /// <response code="400">Cart is empty</response>
         /// <response code="404">Product not found <br/> User not found <br/> Product not found in cart</response>
         /// <response code="500">Failed to remove product from cart. <br/> Failed to add product</response>
-        [HttpPost]
-        public async Task<ActionResult> Post(int id, int quantity, string operation)
+        [HttpPost, Consumes("application/json")]
+        public async Task<ActionResult> Post([FromBody] ChangeLineVM model)
         {
+            if (model == null || !ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             DAL.Results.OperationResult result = null;
 
-            if ("remove".Equals(operation, StringComparison.OrdinalIgnoreCase))
+            if ("remove".Equals(model.Operation, StringComparison.OrdinalIgnoreCase))
             {
-                result = await _cartManager.Remove(id, quantity);
+                result = await _cartManager.Remove(model.Id, model.Quantity);
             }
-            else if ("add".Equals(operation, StringComparison.OrdinalIgnoreCase))
+            else if ("add".Equals(model.Operation, StringComparison.OrdinalIgnoreCase))
             {
-                result = await _cartManager.Add(id, quantity);
+                result = await _cartManager.Add(model.Id, model.Quantity);
             }
             else
             {
@@ -98,7 +104,7 @@ namespace Market.Controllers.Api
                 ResultType.Error => StatusCode(500, result.BuildMessage()),
                 ResultType.Info => StatusCode(400, result.BuildMessage()),
 
-                _ => CreatedAtAction(nameof(Get), new { id }),
+                _ => CreatedAtAction(nameof(Get), new { model.Id }),
             };
         }
 
@@ -107,7 +113,7 @@ namespace Market.Controllers.Api
         /// </summary>
         /// <response code="404">User not found</response>
         /// <response code="400">Cart is empty</response>
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
             var result = await _cartManager.RemoveLine(id);

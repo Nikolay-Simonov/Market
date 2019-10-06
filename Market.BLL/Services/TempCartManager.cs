@@ -29,7 +29,7 @@ namespace Market.BLL.Services
 
             var lines = await _storage.Get() ?? new List<ProductLine>();
 
-            if (!await Database.Products.AnyAsync(p => p.Id == id))
+            if (!await Database.Products.AnyAsync(p => p.Id == id && !p.Removed))
             {
                 lines.RemoveAll(p => p.ProductId == id);
                 await _storage.Set(lines);
