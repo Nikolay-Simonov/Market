@@ -1,11 +1,5 @@
-﻿@using System.Globalization
+@using System.Globalization
 @model string
-
-<style rek="stylesheet">
-    [v-cloak] {
-      display: none;
-    }
-</style>
 
 <div id="cart" style="padding-top: 10px">
     <cart v-cloak inline-template>
@@ -14,15 +8,15 @@
                 <div class="col-md-12">
                     <p v-if="lines.length < 1 && uploaded"><big><b>Your cart is empty :(</b></big></p>
                     <div class="btn-group pull-right">
-                        <a v-if="canContinue" :href="returnUrl" class="btn btn-primary">Continue shopping</a>
-                        <button v-if="lines.length > 0" class="btn btn-danger" v-on:click="clearCart">Clear cart</button>
+                        <a v-if="canContinue" :href="returnUrl" class="btn btn-primary">Back</a>
+                        <button v-if="lines.length > 0" class="btn btn-danger" v-on:click.prevent="clearCartRequest">Clear cart</button>
                     </div>
                 </div>
             </div>
             <div class="row product-item" v-bind:key="line.id" v-for="(line, index) in lines">
                 <div class="col-md-2">
                     <a :href="getProductUrl(index)">
-                        <img :src="line.image" style="max-height: 150px"/>
+                        <img :src="line.image" style="max-height: 150px" />
                     </a>
                 </div>
                 <div class="col-md-4">
@@ -50,9 +44,8 @@
     </cart>
 </div>
 
-@{ 
-    await Html.RenderPartialAsync("_VuePartial");
-    await Html.RenderPartialAsync("_SweetalertPartial");
+@section Sweetalert {
+    @{ await Html.RenderPartialAsync("_SweetalertPartial"); }
 }
 
 <script type="text/javascript">
@@ -71,6 +64,24 @@
             }
         },
         methods: {
+            clearCartRequest: function () {
+                let clear = async () => await this.clearCart();
+
+                swal({
+                    title: "Attention",
+                    text: "Do you really want to clear cart?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonClass: "btn-danger",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No"
+                },
+                async function (isConfirm) {
+                    if (isConfirm) {
+                        await clear();
+                    }
+                });
+            },
             clearCart: async function () {
                 await fetch("/../api/cart", {
                     mode: "cors",
@@ -238,6 +249,11 @@
             });
             this.lines = await response.json();
             this.uploaded = true;
+        },
+        watch: {
+            lines: function (val) {
+                eventBus.$emit("onChangeLines", val);
+            }
         }
     });
 

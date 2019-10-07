@@ -1,4 +1,63 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@using System.Globalization
+
+<div id="cartPartial" class="navbar-btn navbar-right">
+    <cart-partial v-cloak inline-template>
+        <div v-if="lines.length > 0">
+            {{ lines.length }} line(s) {{ total }} @CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol
+            <a :href="cartUrlWithReturn">
+                <div :class="[ isCart ? 'btn-success' : 'btn-primary', 'btn' ]">
+                    <span class="glyphicon glyphicon-shopping-cart"></span>
+                </div>
+            </a>
+        </div>
+    </cart-partial>
+</div>
+
+<script type="text/javascript">
+    Vue.component("cart-partial", {
+        data: function () {
+            return {
+                lines: [],
+                currentUrl: window.location.pathname,
+                cartUrl: "@Url.Action("Lines", "Cart")"
+            }
+        },
+        computed: {
+            total: function () {
+                return this.lines.reduce((total, line) => total + line.totalPrice, 0);
+            },
+            isCart: function () {
+                return this.cartUrl === this.currentUrl;
+            },
+            cartUrlWithReturn: function () {
+                if (this.isCart) {
+                    return "";
+                }
+
+                return `${this.cartUrl}?returnUrl=${this.currentUrl}`;
+            }
+        },
+        created: async function () {
+            if (this.isCart) {
+                eventBus.$on("onChangeLines", lines => {
+                    this.lines = lines;
+                });
+
+                return;
+            }
+
+            let response = await fetch("/../api/cart", {
+                mode: "cors",
+                method: "GET",
+                credentials: "same-origin"
+            });
+            this.lines = await response.json();
+        }
+    });
+
+    if ("@Url.Action("Lines", "Cart")" === window.location.pathname) {
+        var eventBus = new Vue();
+    }
+
+    var cartPartial = new Vue({ el: "#cartPartial" });
+</script>

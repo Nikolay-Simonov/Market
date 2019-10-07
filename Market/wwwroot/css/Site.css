@@ -61,3 +61,7 @@
 .table-striped > tbody > tr:nth-child(odd) > th {
     background-color: #e3f2fd;
 }
+
+[v-cloak] {
+    display: none;
+}
