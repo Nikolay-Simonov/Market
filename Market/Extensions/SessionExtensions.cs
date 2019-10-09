@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+using System;
+using System.Text.Json;
 
 namespace Market.Extensions
 {
@@ -7,33 +8,23 @@ namespace Market.Extensions
     {
         public static void Set<T>(this ISession session, string key, T value)
         {
-            // byte[] bytes = value == null
-            //     ? null
-            //     : JsonSerializer.ToUtf8Bytes(value);
-            //
-            // session.Set(key, bytes);
-
             if (value == null)
             {
                 session.Remove(key);
             }
 
-            string stringValue = JsonConvert.SerializeObject(value);
+            byte[] bytes = JsonSerializer.SerializeToUtf8Bytes<T>(value);
 
-            session.SetString(key, stringValue);
+            session.Set(key, bytes);
         }
 
         public static T Get<T>(this ISession session, string key)
         {
-            // byte[] bytes = session.Get(key);
-            //
-            // return bytes == null
-            //     ? default
-            //     : JsonSerializer.Parse<T>(bytes);
+            ReadOnlySpan<byte> bytes = session.Get(key);
 
-            string value = session.GetString(key);
-
-            return value == null ? default : JsonConvert.DeserializeObject<T>(value);
+            return bytes == null
+                ? default
+                : JsonSerializer.Deserialize<T>(bytes);
         }
     }
 }

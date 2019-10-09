@@ -54,6 +54,12 @@ namespace Market.BLL.Services
                 Product = await Database.Products.Include(p => p.Brand).Include(p => p.Country)
                     .FirstOrDefaultAsync(p => p.Id == id)
             };
+
+            if (line.Product.Brand != null)
+            {
+                line.Product.Brand.Products = null;
+            }
+
             lines.Add(line);
             await _storage.Set(lines);
 

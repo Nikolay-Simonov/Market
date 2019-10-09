@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using System;
 
 namespace Market
@@ -18,12 +17,6 @@ namespace Market
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                Formatting = Formatting.Indented
-            };
         }
 
         public IConfiguration Configuration { get; }
@@ -60,7 +53,7 @@ namespace Market
 
             #endregion
 
-            services.AddControllersWithViews().AddJson();
+            services.AddControllersWithViews();
             services.AddSwagger();
             // Тосты практически не работают (работают через раз) в третьей версии из-за бага
             // Http.DefaultHttpContext.get_Items()
